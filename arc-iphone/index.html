@@ -1,0 +1,3967 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ARC">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0b0c0f">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<title>ARC</title>
+<script>/*ARC_TOKEN*/</script>
+<link rel="icon" href="icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --void:#0b0c0e;
+    --void-2:#111318;
+    --ink: 255,255,255;
+    --teal-rgb: 79,209,197;
+    --on-accent: #04211d;
+    --surface-rgb: 20,22,26;
+    --panel: rgba(var(--ink),0.045);
+    --panel-strong: rgba(var(--ink),0.07);
+    --border: rgba(var(--ink),0.09);
+    --border-soft: rgba(var(--ink),0.06);
+    --text:#f2f0eb;
+    --text-muted:#93959c;
+    --text-dim:#5c5e64;
+    --teal:#4fd1c5;
+    --amber:#e8a33d;
+    --coral:#ff6b5e;
+    --gray-act:#6b6e76;
+    --conn:#5eead4;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --shadow-lift: 0 20px 50px -20px rgba(0,0,0,0.6);
+    --dot-pattern: rgba(var(--ink),0.06);
+  }
+  body.theme-light{
+    --void:#f6efe1;
+    --void-2:#eee0c8;
+    --ink: 43,30,15;
+    --teal-rgb: 221,122,28;
+    --on-accent: #2c1400;
+    --surface-rgb: 250,244,232;
+    --panel: rgba(var(--ink),0.05);
+    --panel-strong: rgba(var(--ink),0.09);
+    --border: rgba(var(--ink),0.14);
+    --border-soft: rgba(var(--ink),0.09);
+    --text:#2b1e0f;
+    --text-muted:#6e5a3e;
+    --text-dim:#a08f70;
+    --teal:#dd7a1c;
+    --amber:#c07a12;
+    --coral:#c94a2e;
+    --gray-act:#8a7859;
+    --conn:#dd7a1c;
+    --shadow-lift: 0 20px 50px -20px rgba(80,55,20,0.25);
+    --dot-pattern: rgba(60,40,15,0.09);
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;background:var(--void);color:var(--text);font-family:'Inter',sans-serif;overflow:hidden;}
+  ::selection{background:rgba(var(--teal-rgb),0.35);}
+
+  .mono{font-family:'JetBrains Mono',monospace;}
+  .app{display:flex;flex-direction:column;height:100vh;width:100vw;position:relative;}
+
+  /* ---------- TOPBAR ---------- */
+  .topbar{
+    display:flex;align-items:center;gap:18px;
+    padding:10px 18px;
+    background:linear-gradient(180deg, rgba(var(--ink),0.05), rgba(var(--ink),0.015));
+    border-bottom:1px solid var(--border);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    z-index:40;
+    flex-shrink:0;
+    flex-wrap:wrap;
+  }
+  .brand{display:flex;align-items:center;gap:9px;font-family:'Bebas Neue',sans-serif;letter-spacing:0.08em;font-size:20px;color:var(--text);white-space:nowrap;}
+  .brand-icon{width:24px;height:24px;border-radius:6px;flex-shrink:0;object-fit:cover;}
+  .slate{
+    width:22px;height:22px;border-radius:4px;flex-shrink:0;
+    background:repeating-linear-gradient(45deg,#fff 0 4px,#0b0c0e 4px 8px);
+    border:1px solid rgba(var(--ink),0.25);
+  }
+  .brand span.sub{color:var(--text-dim);font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.02em;font-weight:400;}
+
+  .toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:1;}
+  .spacer{flex:1;}
+  .hidden{display:none !important;}
+
+  .ws-switch{display:flex;gap:4px;background:var(--panel);padding:3px;border-radius:12px;border:1px solid var(--border);flex-shrink:0;}
+
+  .app-menu{display:flex;gap:2px;flex-shrink:0;}
+  .app-menu-item{position:relative;padding:8px 12px;font-size:13px;font-weight:600;color:var(--text-muted);cursor:pointer;border-radius:8px;user-select:none;}
+  .app-menu-item:hover{background:var(--panel);color:var(--text);}
+  .app-menu-item.open{background:var(--panel-strong);color:var(--text);}
+  .app-menu-dropdown{
+    display:none;position:absolute;top:calc(100% + 6px);left:0;min-width:220px;z-index:60;
+    background:rgba(var(--surface-rgb),0.97);border:1px solid var(--border);border-radius:12px;
+    padding:6px;box-shadow:0 24px 50px -14px rgba(0,0,0,0.6);backdrop-filter:blur(14px);
+  }
+  body.theme-light .app-menu-dropdown{background:rgba(250,244,232,0.98);}
+  .app-menu-item.open .app-menu-dropdown{display:block;}
+  .app-menu-dropdown button{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;
+    text-align:left;background:transparent;border:none;padding:8px 10px;font-size:12.5px;
+    font-weight:500;color:var(--text);border-radius:7px;cursor:pointer;
+  }
+  .app-menu-dropdown button:hover{background:var(--panel-strong);}
+  .menu-shortcut{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);}
+  .app-menu-sep{height:1px;background:var(--border-soft);margin:5px 4px;}
+  .app-menu-sub{position:relative;}
+  .app-menu-sub-label{display:block;padding:8px 10px;font-size:12.5px;font-weight:500;color:var(--text-muted);cursor:default;}
+  .app-menu-flyout{position:absolute;top:0;left:calc(100% + 4px);min-width:230px;max-height:280px;overflow-y:auto;}
+  .app-menu-sub:hover .app-menu-flyout{display:block;}
+  .app-menu-empty{display:block;padding:8px 12px;font-size:12px;color:var(--text-dim);}
+  .app-menu-recent-item{display:flex;flex-direction:column;align-items:flex-start !important;gap:1px;}
+  .app-menu-recent-name{font-weight:600;}
+  .app-menu-recent-path{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--text-dim);max-width:210px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+  .project-name{font-size:11.5px;color:var(--text-dim);flex-shrink:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-right:4px;}
+  .ws-btn{background:transparent;border:none;padding:7px 13px;font-size:12px;font-weight:600;border-radius:9px;color:var(--text-muted);cursor:pointer;transition:background .15s ease, color .15s ease;}
+  .ws-btn.active{background:rgba(var(--teal-rgb),0.18);color:var(--teal);}
+  .ws-btn:hover{background:rgba(var(--ink),0.07);}
+
+  .mood-filter-chips{display:flex;gap:6px;flex-wrap:wrap;}
+  .mood-chip{font-size:11.5px;padding:6px 12px;border-radius:20px;background:rgba(var(--ink),0.05);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;gap:6px;color:var(--text);transition:background .15s ease, border-color .15s ease;}
+  .mood-chip .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+  .mood-chip.active{border-color:currentColor;background:rgba(var(--ink),0.09);}
+  .mood-chip:hover{background:rgba(var(--ink),0.09);}
+  #moodSearch{width:220px;}
+
+  .mood-card{position:absolute;width:210px;background:rgba(var(--ink),0.05);border:1px solid var(--border);border-radius:14px;overflow:hidden;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:var(--shadow-lift);cursor:grab;user-select:none;transition:opacity .2s ease, box-shadow .2s ease;}
+  .mood-card.dragging{cursor:grabbing;z-index:50;box-shadow:0 30px 60px -15px rgba(0,0,0,0.7);}
+  .mood-card.dimmed{opacity:0.18;}
+  .mood-img-wrap{position:relative;width:100%;height:150px;background:#101114;}
+  .mood-img-wrap img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;}
+  .mood-img-empty{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:11px;}
+  .mood-cat-badge{position:absolute;top:8px;left:8px;font-size:9px;padding:3px 8px;border-radius:10px;border:1px solid;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.03em;backdrop-filter:blur(6px);}
+  .mood-card-actions{position:absolute;top:6px;right:6px;display:flex;gap:2px;opacity:0;transition:opacity .15s ease;}
+  .mood-card:hover .mood-card-actions{opacity:1;}
+  .mood-card-actions button{width:24px;height:24px;padding:0;background:rgba(0,0,0,0.55);border:none;color:#fff;font-size:11px;border-radius:6px;}
+  .mood-caption{padding:9px 11px 2px 11px;font-size:12.5px;font-weight:600;line-height:1.3;}
+  .mood-tags{display:flex;flex-wrap:wrap;gap:5px;padding:6px 11px 11px 11px;}
+
+  .mood-upload-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+  .mood-upload-status{font-size:11px;color:var(--text-dim);}
+  .mood-preview-wrap{margin-top:10px;border-radius:10px;overflow:hidden;border:1px solid var(--border);}
+  .mood-preview-wrap img{width:100%;display:block;max-height:180px;object-fit:cover;}
+
+  .doc-beat-divider{margin:26px 0 4px 0;padding-top:10px;border-top:1px dotted rgba(0,0,0,0.25);font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:0.05em;color:rgba(0,0,0,0.42);text-transform:uppercase;}
+  .doc-beat-divider:first-child{border-top:none;margin-top:0;padding-top:0;}
+  .doc-empty-hint{color:rgba(0,0,0,0.4);font-family:'Inter',sans-serif;font-size:13px;}
+
+  .workspace-doc{flex-direction:column;}
+  .doc-subheader{display:flex;align-items:center;gap:18px;padding:14px 22px;border-bottom:1px solid var(--border);background:linear-gradient(180deg, rgba(var(--ink),0.04), rgba(var(--ink),0.01));flex-shrink:0;flex-wrap:wrap;}
+
+  .doc-body{flex:1;display:flex;min-height:0;}
+  .page-guide{
+    width:78px;flex-shrink:0;background:var(--panel);border-left:1px solid var(--border);
+    display:flex;flex-direction:column;align-items:stretch;overflow:hidden;
+  }
+  .page-guide-current{
+    flex-shrink:0;padding:14px 8px;text-align:center;border-bottom:1px solid var(--border-soft);
+    font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--teal);
+    line-height:1.3;
+  }
+  .page-guide-list{flex:1;overflow-y:auto;padding:8px 6px;display:flex;flex-direction:column;gap:4px;}
+  .page-guide-item{
+    padding:6px 4px;text-align:center;border-radius:8px;cursor:pointer;
+    font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-muted);
+    border:1px solid transparent;
+  }
+  .page-guide-item:hover{background:var(--panel-strong);color:var(--text);}
+  .page-guide-item.active{background:rgba(var(--teal-rgb),0.16);border-color:rgba(var(--teal-rgb),0.4);color:var(--teal);font-weight:700;}
+  .doc-stats{font-size:12px;color:var(--text-muted);}
+  .doc-toggle{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-muted);cursor:pointer;user-select:none;}
+  .doc-toggle input{accent-color:var(--teal);width:15px;height:15px;cursor:pointer;}
+
+  button{
+    font-family:'Inter',sans-serif;font-size:13px;font-weight:600;
+    color:var(--text);background:var(--panel);border:1px solid var(--border);
+    padding:8px 14px;border-radius:10px;cursor:pointer;
+    transition:background .15s ease, transform .1s ease, border-color .15s ease;
+    display:flex;align-items:center;gap:6px;white-space:nowrap;
+  }
+  button:hover{background:var(--panel-strong);border-color:rgba(var(--ink),0.18);}
+  button:active{transform:scale(0.97);}
+  button.primary{background:linear-gradient(180deg, rgba(var(--teal-rgb),0.9), rgba(var(--teal-rgb),0.65));color:var(--on-accent);border-color:rgba(var(--teal-rgb),0.5);}
+  button.primary:hover{filter:brightness(1.08);}
+  button.active{background:rgba(var(--teal-rgb),0.18);border-color:rgba(var(--teal-rgb),0.55);color:var(--teal);}
+  button.ghost{background:transparent;border-color:transparent;color:var(--text-muted);padding:8px 10px;}
+  button.ghost:hover{background:var(--panel);color:var(--text);}
+  button.danger:hover{border-color:rgba(255,107,94,0.5);color:var(--coral);}
+  button.icon{padding:8px;width:34px;height:34px;justify-content:center;}
+
+  input[type="text"], textarea, select{
+    font-family:'Inter',sans-serif;font-size:13px;color:var(--text);
+    background:rgba(var(--ink),0.04);border:1px solid var(--border);
+    border-radius:10px;padding:8px 12px;outline:none;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  input[type="text"]:focus, textarea:focus, select:focus{border-color:rgba(var(--teal-rgb),0.5);background:rgba(var(--ink),0.06);}
+  input#search{width:230px;}
+  input#search::placeholder{color:var(--text-dim);}
+
+  /* ---------- WORKSPACE ---------- */
+  .workspace{flex:1;display:flex;min-height:0;position:relative;}
+
+  .canvas-wrap{
+    flex:1;position:relative;overflow:hidden;cursor:grab;
+    background-color:var(--void);
+    background-image: radial-gradient(rgba(var(--ink),0.06) 1px, transparent 1px);
+    background-size: 26px 26px;
+    background-position: -4px -4px;
+  }
+  .canvas-wrap.panning{cursor:grabbing;}
+  .canvas-wrap.connect-mode{cursor:crosshair;}
+
+  #canvas, #moodCanvas{
+    position:absolute;top:0;left:0;width:2600px;height:1500px;
+    transform-origin: 0 0;
+    transition: transform .12s ease-out;
+  }
+  #canvas.no-anim, #moodCanvas.no-anim{transition:none;}
+
+  svg#connLayer{position:absolute;top:0;left:0;width:100%;height:100%;overflow:visible;pointer-events:none;}
+  svg#connLayer path.hit{pointer-events:stroke;cursor:pointer;}
+  svg#connLayer path.hit:hover + path.visible{stroke:var(--coral);filter:drop-shadow(0 0 6px rgba(255,107,94,0.7));}
+
+  .act-lane{
+    position:absolute;top:0;bottom:0;
+    border-radius:20px;
+    background:linear-gradient(180deg, rgba(var(--ink),0.025), rgba(var(--ink),0.005));
+    border:1px dashed rgba(var(--ink),0.08);
+    pointer-events:none;
+    opacity:0;
+    transition:opacity .25s ease;
+  }
+  .act-lane.show{opacity:1;}
+  .act-lane .lane-label{
+    position:sticky;top:14px;left:14px;
+    font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:0.06em;
+    padding:6px 14px;border-radius:8px;display:inline-block;margin:14px;
+  }
+
+  /* ---------- BEAT CARD ---------- */
+  .beat-card{
+    position:absolute;
+    background:rgba(var(--ink),0.055);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: var(--shadow-lift);
+    cursor:grab;
+    user-select:none;
+    transition: left .35s cubic-bezier(.2,.8,.2,1), top .35s cubic-bezier(.2,.8,.2,1), opacity .2s ease, box-shadow .2s ease, transform .12s ease;
+  }
+  .beat-card.dragging{cursor:grabbing;transition:none;z-index:50;box-shadow:0 30px 60px -15px rgba(0,0,0,0.7);}
+  .beat-card.dimmed{opacity:0.22;filter:saturate(0.3);}
+  .beat-card.glow{box-shadow:0 0 0 2px var(--glow-color, var(--teal)), var(--shadow-lift);}
+  .beat-card.connect-source{box-shadow:0 0 0 2px var(--teal), 0 0 20px rgba(var(--teal-rgb),0.5);}
+  .beat-card.no-anim{transition:opacity .2s ease, box-shadow .2s ease;}
+
+  .card-bar{height:5px;border-radius:16px 16px 0 0;}
+  .card-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 0 12px;}
+  .card-id{font-size:10px;color:var(--text-dim);letter-spacing:0.05em;}
+  .card-actions{display:flex;gap:2px;opacity:0;transition:opacity .15s ease;}
+  .beat-card:hover .card-actions{opacity:1;}
+  .card-actions button{padding:4px 6px;width:24px;height:24px;font-size:11px;background:transparent;border:none;color:var(--text-muted);}
+  .card-actions button:hover{background:rgba(var(--ink),0.1);color:var(--text);}
+
+  .card-title{font-size:14.5px;font-weight:700;padding:6px 12px 2px 12px;line-height:1.3;outline:none;border-radius:5px;cursor:text;}
+  .card-title:empty:before{content:'Sin título';color:var(--text-dim);font-weight:600;}
+  .card-title:focus{background:rgba(var(--teal-rgb),0.08);box-shadow:0 0 0 1px rgba(var(--teal-rgb),0.35);}
+  .card-desc{font-size:12px;color:var(--text-muted);padding:2px 12px 0 12px;line-height:1.45;outline:none;cursor:text;border-radius:5px;white-space:pre-wrap;}
+  .card-desc:empty:before{content:attr(data-placeholder);color:var(--text-dim);}
+  .card-desc:focus{background:rgba(var(--teal-rgb),0.06);box-shadow:0 0 0 1px rgba(var(--teal-rgb),0.25);}
+  .card-step{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);padding:6px 12px 0 12px;}
+
+  .card-resize-handle{
+    position:absolute;right:0;bottom:0;width:16px;height:16px;cursor:ew-resize;
+    opacity:0;transition:opacity .15s ease;
+  }
+  .beat-card:hover .card-resize-handle{opacity:0.6;}
+  .card-resize-handle:hover{opacity:1 !important;}
+  .card-resize-handle::after{
+    content:'';position:absolute;right:3px;bottom:3px;width:8px;height:8px;
+    border-right:2px solid var(--text-dim);border-bottom:2px solid var(--text-dim);border-radius:0 0 3px 0;
+  }
+
+  .chip-row{display:flex;flex-wrap:wrap;gap:5px;padding:9px 12px 12px 12px;}
+  .chip{
+    font-size:10.5px;padding:3px 8px;border-radius:20px;
+    background:rgba(var(--ink),0.07);border:1px solid rgba(var(--ink),0.08);
+    cursor:pointer;transition:background .15s ease, border-color .15s ease;
+    display:flex;align-items:center;gap:4px;color:var(--text);
+  }
+  .chip:hover{background:rgba(var(--ink),0.14);}
+  .chip .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+  .chip.prop{font-family:'JetBrains Mono',monospace;color:var(--text-muted);background:rgba(var(--ink),0.03);}
+
+  /* ---------- CONNECT BANNER ---------- */
+  .connect-banner{
+    position:absolute;top:16px;left:50%;transform:translateX(-50%);
+    background:rgba(var(--surface-rgb),0.9);border:1px solid rgba(var(--teal-rgb),0.4);
+    color:var(--teal);padding:9px 16px;border-radius:30px;font-size:12.5px;font-weight:600;
+    display:none;align-items:center;gap:10px;z-index:30;backdrop-filter:blur(10px);
+    box-shadow:0 10px 30px -10px rgba(0,0,0,0.6);
+  }
+  .connect-banner.show{display:flex;}
+  .connect-banner button{padding:3px 8px;font-size:11px;height:auto;}
+
+  /* ---------- EMPTY STATE ---------- */
+  .empty-state{
+    position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:16px;pointer-events:none;text-align:center;
+  }
+  .empty-state.hide{display:none;}
+  .empty-state h1{font-family:'Bebas Neue',sans-serif;font-size:56px;letter-spacing:0.05em;margin:0;color:var(--text);}
+  .empty-state p{color:var(--text-muted);font-size:14px;max-width:380px;margin:0;}
+  .empty-state .actions{display:flex;gap:10px;pointer-events:all;margin-top:6px;}
+
+  /* ---------- SIDEBAR ---------- */
+  .sidebar{
+    width:320px;flex-shrink:0;
+    background:rgba(var(--ink),0.03);
+    border-left:1px solid var(--border);
+    backdrop-filter: blur(20px);-webkit-backdrop-filter: blur(20px);
+    display:flex;flex-direction:column;min-height:0;
+    transition:width .2s ease, opacity .2s ease;
+  }
+  .sidebar.collapsed{width:0;opacity:0;overflow:hidden;border-left:none;}
+  .tabs{display:flex;flex-wrap:wrap;border-bottom:1px solid var(--border);flex-shrink:0;}
+  .tab{flex:1 1 33.33%;text-align:center;padding:11px 4px;font-size:11.5px;font-weight:600;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;transition:color .15s ease, border-color .15s ease;}
+  .tab:hover{color:var(--text);}
+  .tab.active{color:var(--teal);border-color:var(--teal);}
+  .tab-content{flex:1;overflow-y:auto;padding:16px;display:none;}
+  .tab-content.active{display:block;}
+  .tab-content::-webkit-scrollbar{width:6px;}
+  .tab-content::-webkit-scrollbar-thumb{background:rgba(var(--ink),0.12);border-radius:10px;}
+
+  .section-title{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:0.08em;color:var(--text-dim);text-transform:uppercase;margin:0 0 10px 0;}
+
+  .entity-row{
+    display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;
+    background:rgba(var(--ink),0.03);border:1px solid transparent;margin-bottom:6px;
+    cursor:pointer;transition:background .15s ease, border-color .15s ease;
+  }
+  .entity-row:hover{background:rgba(var(--ink),0.06);}
+  .entity-row.focused{border-color:rgba(var(--teal-rgb),0.5);background:rgba(var(--teal-rgb),0.08);}
+  .entity-row .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+  .entity-row .name{flex:1;font-size:13px;}
+  .entity-row .count{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text-dim);}
+  .entity-row .del{opacity:0;color:var(--text-dim);}
+  .entity-row:hover .del{opacity:1;}
+  .entity-row .del:hover{color:var(--coral);}
+
+  .add-row{display:flex;gap:6px;margin-top:10px;}
+  .add-row input{flex:1;}
+
+  .prop-cloud{display:flex;flex-wrap:wrap;gap:6px;}
+
+  /* character development accordion */
+  .dev-card{background:rgba(var(--ink),0.03);border:1px solid var(--border-soft);border-radius:12px;margin-bottom:8px;overflow:hidden;}
+  .dev-head{display:flex;align-items:center;gap:9px;padding:11px 12px;cursor:pointer;}
+  .dev-head .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+  .dev-name{flex:1;font-size:13px;font-weight:600;}
+  .dev-progress{font-size:10px;color:var(--text-dim);}
+  .dev-chevron{font-size:11px;color:var(--text-dim);transition:transform .2s ease;}
+  .dev-card.open .dev-chevron{transform:rotate(180deg);}
+  .dev-body{max-height:0;overflow:hidden;transition:max-height .3s ease;padding:0 12px;}
+  .dev-card.open .dev-body{max-height:1000px;padding:2px 12px 12px 12px;}
+  .dev-field{margin-bottom:9px;}
+  .dev-field label{display:block;font-size:10px;color:var(--text-dim);margin-bottom:4px;font-family:'JetBrains Mono',monospace;letter-spacing:0.02em;}
+  .dev-field textarea{width:100%;font-family:'Inter',sans-serif;font-size:12px;resize:vertical;min-height:40px;}
+  .tab-intro{font-size:12px;color:var(--text-muted);line-height:1.5;margin:0 0 14px 0;}
+
+  /* script badge on beat card */
+  .script-badge{font-family:'JetBrains Mono',monospace;font-size:10px;padding:7px 12px 0 12px;display:flex;align-items:center;gap:5px;}
+  .script-badge-ok{color:var(--teal);}
+  .script-badge-warn{color:var(--amber);}
+  .script-badge-over{color:var(--coral);}
+  .script-badge-neutral{color:var(--text-dim);}
+
+  .predict-slot:empty{display:none;}
+  .predict-box{margin:9px 12px 0 12px;padding:8px 10px;border-radius:10px;background:rgba(var(--teal-rgb),0.08);border:1px solid rgba(var(--teal-rgb),0.25);}
+  .predict-text{font-size:11.5px;color:var(--teal);line-height:1.4;font-style:italic;}
+  .predict-loading{font-size:11px;color:var(--text-dim);font-family:'JetBrains Mono',monospace;}
+  .predict-error{font-size:11px;color:var(--coral);}
+  .predict-actions{display:flex;gap:6px;margin-top:6px;}
+  .predict-actions button{padding:3px 8px;font-size:10px;height:auto;background:rgba(var(--ink),0.06);}
+
+  .llm-status-dot{width:8px;height:8px;border-radius:50%;background:var(--text-dim);display:inline-block;margin-right:6px;}
+  .llm-status-dot.ok{background:var(--teal);}
+  .llm-status-dot.fail{background:var(--coral);}
+  .lan-url-box{font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(var(--ink),0.05);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+
+  .scene-prompt-panel{padding:14px 22px;border-bottom:1px solid var(--border-soft);background:rgba(var(--teal-rgb),0.04);flex-shrink:0;}
+  .scene-prompt-panel textarea{width:100%;min-height:56px;font-family:'Inter',sans-serif;font-size:13px;resize:vertical;}
+  .scene-prompt-row{display:flex;align-items:center;gap:10px;margin-top:8px;}
+  .scene-prompt-counter{font-size:10.5px;color:var(--text-dim);}
+  .scene-gen-status{margin-top:8px;font-size:12px;color:var(--text-muted);min-height:0;}
+  .scene-gen-status:empty{display:none;}
+  .scene-insert-actions{display:flex;gap:8px;margin-top:6px;}
+  .scene-insert-actions button{padding:4px 10px;font-size:11px;}
+  .gen-progress-wrap{display:flex;flex-direction:column;gap:6px;}
+  .gen-progress-label{font-size:11.5px;color:var(--text-muted);}
+  .gen-progress-track{height:4px;border-radius:3px;background:var(--panel-strong);overflow:hidden;}
+  .gen-progress-fill{height:100%;width:0%;background:var(--teal);transition:width .2s linear;}
+
+  /* script editor modal */
+  #scriptModal{width:97vw !important;max-width:97vw !important;height:94vh;max-height:94vh;display:flex;flex-direction:column;padding:0;overflow:hidden;}
+
+  @media print{
+    body > *:not(#printMount){display:none !important;}
+    #printMount{display:block !important;}
+    #printMount .script-page{
+      box-shadow:none !important;max-width:none !important;width:100% !important;
+      margin:0 !important;min-height:0 !important;background:#fff !important;color:#111 !important;
+    }
+    #printMount .page-break-marker{break-after:page;height:0 !important;margin:0 !important;background:transparent !important;box-shadow:none !important;}
+    #printMount .page-break-marker span{display:none !important;}
+    #printMount .sp-block{background:transparent !important;}
+  }
+  #printMount{display:none;}
+
+  .char-autocomplete{
+    position:fixed;z-index:600;display:none;min-width:170px;max-height:220px;overflow-y:auto;
+    background:rgba(var(--surface-rgb),0.98);border:1px solid var(--border);border-radius:10px;padding:5px;
+    box-shadow:0 20px 40px -12px rgba(0,0,0,0.5);
+  }
+  .char-autocomplete.show{display:block;}
+  .char-ac-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;cursor:pointer;font-size:12.5px;color:var(--text);}
+  .char-ac-item .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+  .char-ac-item.hl{background:rgba(var(--teal-rgb),0.18);}
+  .script-modal-header{display:flex;align-items:center;gap:12px;padding:16px 22px;border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;}
+  .script-modal-header > div:first-child{flex:1;min-width:120px;overflow:hidden;}
+  .script-modal-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .script-modal-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:0.04em;}
+  .script-modal-sub{font-size:11px;color:var(--text-dim);margin-top:3px;}
+  .script-target-field{display:flex;flex-direction:column;gap:4px;margin-left:auto;}
+  .script-target-field label{font-size:9.5px;color:var(--text-dim);font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.03em;}
+  .script-target-field input{width:72px;}
+  .script-toolbar{display:flex;align-items:center;gap:6px;padding:10px 22px;border-bottom:1px solid var(--border-soft);flex-shrink:0;flex-wrap:wrap;}
+  .script-toolbar button{font-size:11.5px;padding:6px 11px;}
+  .script-toolbar button.on{background:rgba(var(--teal-rgb),0.18);border-color:rgba(var(--teal-rgb),0.5);color:var(--teal);}
+  .script-toolbar .hint{font-size:10px;color:var(--text-dim);margin-left:auto;white-space:nowrap;}
+  .script-page-wrap{flex:1;overflow-y:auto;padding:34px 20px;background:var(--void-2);display:flex;justify-content:center;align-items:flex-start;}
+  .script-page-wrap::-webkit-scrollbar{width:8px;}
+  .script-page-wrap::-webkit-scrollbar-thumb{background:rgba(var(--ink),0.12);border-radius:10px;}
+  .script-page{
+    width:100%;max-width:calc(60ch + 8px + 112px);min-height:820px;
+    background:#f4f1ea;color:#17140f;
+    font-family:'Courier Prime', monospace; font-size:12.5px; line-height:1.6;
+    padding:58px 56px 80px 56px; border-radius:2px;
+    box-shadow:0 30px 70px -20px rgba(0,0,0,0.65), 0 0 0 1px rgba(0,0,0,0.06);
+    outline:none; border:none;
+  }
+  .sp-block{outline:none;white-space:pre-wrap;overflow-wrap:break-word;word-break:break-word;min-height:1.6em;border-radius:3px;padding:1px 4px;box-sizing:border-box;max-width:100%;}
+  .sp-block.ai-generated{box-shadow:inset 3px 0 0 var(--teal);padding-left:9px;}
+  .sp-block:empty:before{content:attr(data-placeholder);color:rgba(0,0,0,0.3);}
+  .sp-block.focused{background:rgba(var(--teal-rgb),0.12);}
+  .sp-heading{text-transform:uppercase;font-weight:700;margin-top:20px;}
+  .sp-action{margin-top:12px;}
+  .sp-note{margin-top:12px;font-style:italic;}
+  .sp-character{margin-top:20px;margin-left:22ch;text-transform:uppercase;}
+  .sp-parenthetical{margin-left:16ch;width:calc(22ch + 8px);font-style:italic;}
+  .sp-dialogue{margin-left:10ch;width:calc(35ch + 8px);margin-bottom:2px;}
+  .sp-transition{text-align:right;text-transform:uppercase;margin-top:20px;}
+  .page-break-marker{
+    position:relative;height:64px;margin:80px -56px 58px -56px;
+    background:var(--void-2);
+    box-shadow: inset 0 10px 12px -9px rgba(0,0,0,0.32), inset 0 -10px 12px -9px rgba(0,0,0,0.32);
+  }
+  .page-break-marker span{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    background:#f4f1ea;padding:3px 12px;border-radius:20px;border:1px solid rgba(0,0,0,0.12);
+    font-family:'JetBrains Mono',monospace;font-size:9.5px;color:rgba(0,0,0,0.5);letter-spacing:0.05em;
+    white-space:nowrap;
+  }
+
+  /* guide */
+  .step-card{
+    padding:12px;border-radius:12px;background:rgba(var(--ink),0.03);border:1px solid var(--border-soft);
+    margin-bottom:8px;
+  }
+  .step-card .step-head{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+  .step-num{font-family:'JetBrains Mono',monospace;font-size:11px;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--on-accent);font-weight:700;}
+  .step-title{font-size:13.5px;font-weight:700;flex:1;}
+  .step-desc{font-size:12px;color:var(--text-muted);line-height:1.4;margin:0 0 8px 30px;}
+  .step-add{margin-left:30px;padding:5px 10px;font-size:11px;}
+
+  /* ---------- MODAL ---------- */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(5,6,8,0.65);backdrop-filter:blur(6px);
+    display:none;align-items:center;justify-content:center;z-index:100;
+  }
+  .modal-overlay.show{display:flex;}
+  .modal{
+    width:460px;max-width:92vw;max-height:86vh;overflow-y:auto;
+    background:rgba(var(--surface-rgb),0.92);border:1px solid var(--border);border-radius:20px;
+    padding:22px;box-shadow:0 40px 80px -20px rgba(0,0,0,0.7);
+  }
+  .modal::-webkit-scrollbar{width:6px;}
+  .modal::-webkit-scrollbar-thumb{background:rgba(var(--ink),0.12);border-radius:10px;}
+  .modal h2{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:0.04em;margin:0 0 16px 0;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:11px;color:var(--text-dim);margin-bottom:6px;font-family:'JetBrains Mono',monospace;letter-spacing:0.03em;text-transform:uppercase;}
+  .field input[type="text"], .field textarea, .field select{width:100%;}
+  .field textarea{resize:vertical;min-height:60px;font-family:'Inter',sans-serif;}
+  .chip-select{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip-toggle{
+    font-size:12px;padding:6px 12px;border-radius:20px;cursor:pointer;
+    background:rgba(var(--ink),0.05);border:1px solid var(--border);
+    display:flex;align-items:center;gap:6px;transition:all .15s ease;
+  }
+  .chip-toggle.on{background:rgba(var(--teal-rgb),0.16);border-color:rgba(var(--teal-rgb),0.5);}
+  .chip-toggle .dot{width:7px;height:7px;border-radius:50%;}
+  .act-picker{display:flex;gap:8px;}
+  .act-opt{flex:1;text-align:center;padding:8px;border-radius:10px;border:1px solid var(--border);cursor:pointer;font-size:12px;font-weight:600;transition:all .15s ease;}
+  .act-opt.on{border-color:currentColor;background:rgba(var(--ink),0.08);}
+  .modal-footer{display:flex;justify-content:space-between;align-items:center;margin-top:20px;gap:10px;}
+
+  /* toast */
+  .toast{
+    position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:rgba(var(--surface-rgb),0.95);border:1px solid var(--border);
+    padding:10px 16px;border-radius:12px;font-size:13px;display:flex;align-items:center;gap:12px;
+    opacity:0;pointer-events:none;transition:opacity .2s ease, transform .2s ease;z-index:200;
+    box-shadow:0 20px 40px -15px rgba(0,0,0,0.6);
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:all;}
+  .toast button{padding:4px 10px;font-size:11.5px;}
+
+  /* focus banner */
+  .filter-banner{
+    position:absolute;top:16px;right:16px;background:rgba(var(--surface-rgb),0.9);
+    border:1px solid var(--border);padding:7px 12px;border-radius:20px;font-size:12px;
+    display:none;align-items:center;gap:8px;z-index:30;backdrop-filter:blur(10px);
+  }
+  .filter-banner.show{display:flex;}
+  .filter-banner .dot{width:8px;height:8px;border-radius:50%;}
+  .filter-banner button{padding:3px 8px;font-size:11px;}
+
+  /* zoom controls */
+  .zoom-controls{position:absolute;bottom:18px;left:18px;display:flex;gap:6px;z-index:20;}
+  .zoom-controls button{width:32px;height:32px;padding:0;justify-content:center;background:rgba(var(--surface-rgb),0.75);backdrop-filter:blur(10px);}
+
+  ::-webkit-scrollbar{width:8px;height:8px;}
+  ::-webkit-scrollbar-thumb{background:rgba(var(--ink),0.1);border-radius:10px;}  /* ---------- LAYOUT: fila con barra lateral izquierda + vistas ---------- */
+  .app-row{flex:1;display:flex;min-height:0;}
+  .app-views{flex:1;display:flex;flex-direction:column;min-height:0;min-width:0;}
+
+  .left-sidebar{
+    width:250px;flex-shrink:0;overflow:hidden;
+    background:var(--panel);border-right:1px solid var(--border);
+    display:flex;flex-direction:column;min-height:0;
+    transition:width .2s ease, opacity .2s ease;
+  }
+  .left-sidebar.collapsed{width:0;opacity:0;border-right:none;}
+  .left-sidebar-head{display:flex;align-items:center;justify-content:space-between;padding:14px 14px 4px 16px;flex-shrink:0;}
+  .left-sidebar-actions{display:flex;gap:8px;padding:10px 14px;flex-shrink:0;}
+  .left-sidebar-actions button{flex:1;font-size:12px;padding:7px 8px;}
+  .left-sidebar-list{flex:1;overflow-y:auto;padding:6px 10px 14px;}
+  .project-item{
+    display:flex;flex-direction:column;gap:1px;padding:9px 10px;border-radius:10px;
+    cursor:pointer;margin-bottom:4px;border:1px solid transparent;
+  }
+  .project-item:hover{background:var(--panel-strong);}
+  .project-item.active{border-color:rgba(var(--teal-rgb),0.4);background:rgba(var(--teal-rgb),0.08);}
+  .project-item-name{font-size:12.5px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .project-item-path{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  /* ---------- LAUNCHER: pantalla de menú de proyectos ---------- */
+  .launcher-screen{
+    position:fixed;inset:0;z-index:500;background:var(--void);
+    display:none;align-items:center;justify-content:center;
+    background-image: radial-gradient(var(--dot-pattern) 1px, transparent 1px);
+    background-size: 26px 26px;
+  }
+  .launcher-screen.show{display:flex;}
+  .launcher-inner{
+    width:420px;max-width:90vw;max-height:85vh;display:flex;flex-direction:column;align-items:center;
+    background:rgba(var(--surface-rgb),0.9);border:1px solid var(--border);border-radius:22px;
+    padding:36px 32px 24px;box-shadow:0 40px 90px -30px rgba(0,0,0,0.5);backdrop-filter:blur(16px);
+  }
+  .launcher-logo{width:76px;height:76px;border-radius:18px;margin-bottom:14px;object-fit:cover;}
+  .launcher-inner h1{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:0.08em;margin:0;color:var(--text);}
+  .launcher-sub{font-size:12.5px;color:var(--text-muted);margin:2px 0 22px 0;}
+  .launcher-recovery{display:flex;align-items:center;gap:8px;padding:10px 12px;margin-bottom:14px;border-radius:12px;background:rgba(var(--teal-rgb),0.12);border:1px solid rgba(var(--teal-rgb),0.35);font-size:12.5px;}
+  .launcher-recovery>div{flex:1;} .launcher-recovery span{color:var(--text-muted);font-size:11.5px;}
+  .launcher-actions{display:flex;gap:10px;width:100%;margin-bottom:22px;}
+  .launcher-actions button{flex:1;padding:11px;font-size:13px;}
+  .launcher-recents{width:100%;overflow-y:auto;min-height:0;flex:1;}
+  .launcher-recents .section-title{margin:0 0 8px 2px;}
+  .launcher-recents .project-item{padding:11px 12px;}
+
+  /* ===================== MÓVIL (iPhone / iPad vertical) ===================== */
+  @media (max-width: 820px){
+    html,body{height:100%;overscroll-behavior:none;}
+    .app{height:100dvh;width:100%;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right);}
+    .topbar{flex-wrap:wrap;gap:6px 8px;padding:calc(env(safe-area-inset-top) + 8px) 12px 8px 12px;}
+    .brand .sub{display:none;}
+    .app-menu-item{padding:8px 10px;}
+    .project-name{flex:1;}
+    .ws-switch{order:5;width:100%;justify-content:space-between;}
+    .ws-btn{flex:1;padding:8px 6px;font-size:12.5px;white-space:nowrap;}
+    .toolbar{order:6;width:100%;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px;}
+    .toolbar > *{flex-shrink:0;}
+    .toolbar input[type=text]{width:150px;}
+    #btnConnect,#btnGroup{display:none;}
+    .left-sidebar{position:absolute;z-index:30;left:0;top:0;bottom:0;width:78vw;max-width:300px;box-shadow:12px 0 40px rgba(0,0,0,0.5);}
+    .left-sidebar.collapsed{width:0;box-shadow:none;}
+    .sidebar{position:absolute;z-index:25;right:0;top:0;bottom:0;width:88vw;max-width:340px;box-shadow:-12px 0 40px rgba(0,0,0,0.5);}
+    .sidebar.collapsed{width:0;box-shadow:none;}
+    .doc-subheader{padding:10px 12px;gap:8px 12px;}
+    .script-toolbar{padding:8px 12px;position:sticky;top:0;z-index:5;background:var(--void-2);}
+    .script-toolbar button{font-size:13px;padding:9px 12px;}
+    .script-toolbar .hint{display:none;}
+    #scriptModal{width:100vw !important;max-width:100vw !important;height:100dvh;max-height:100dvh;border-radius:0 !important;}
+    .script-modal-header{padding:calc(env(safe-area-inset-top) + 10px) 12px 10px 12px;gap:8px;}
+    .script-page-wrap{padding:14px 8px 70px 8px;}
+    .script-page{padding:34px 22px 60px 22px;font-size:14px;min-height:60vh;}
+    .modal{max-width:94vw !important;max-height:90dvh;}
+    .launcher-inner{width:92vw;}
+    button,.ws-btn,.app-menu-item{min-height:36px;}
+    .menu-shortcut{display:none;}
+
+    /* --- más sitio para el guion --- */
+    .topbar{gap:4px 8px;padding:calc(env(safe-area-inset-top) + 4px) 10px 4px 10px;}
+    .brand{font-size:17px;gap:6px;} .brand-icon{width:20px;height:20px;}
+    .app-menu-item{padding:6px 8px;font-size:12.5px;min-height:30px;}
+    .ws-btn{padding:6px 4px;font-size:12px;min-height:30px;}
+    .ws-switch{padding:2px;}
+    .doc-subheader{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:10px;padding:5px 10px;}
+    .doc-subheader > *{flex-shrink:0;white-space:nowrap;}
+    .doc-subheader .spacer{display:none;}
+    .doc-stats{font-size:11px;}
+    .doc-toggle{font-size:11.5px;gap:5px;}
+    .doc-subheader button{font-size:12px;padding:6px 9px;min-height:30px;}
+    .script-toolbar{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:5px;padding:6px 8px;}
+    .script-toolbar > *{flex-shrink:0;}
+    .script-toolbar button{font-size:12px;padding:7px 9px;min-height:32px;}
+    .script-modal-header{flex-wrap:nowrap;padding:calc(env(safe-area-inset-top) + 6px) 10px 6px 10px;gap:6px;}
+    .script-modal-title{font-size:17px;}
+    .script-modal-sub{font-size:10px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .script-target-field label{display:none;}
+    .script-target-field input{width:54px;padding:6px 8px;}
+    .script-modal-header button{padding:6px 8px;min-height:30px;}
+    .script-page-wrap{padding:8px 4px 90px 4px;}
+    .script-page{padding:26px 16px 70px 16px;font-size:14px;}
+    .sp-character{margin-left:24%;}
+    .sp-parenthetical{margin-left:17%;width:62%;}
+    .sp-dialogue{margin-left:7%;width:90%;}
+    /* guía de página: píldora flotante en vez de columna */
+    .doc-body{position:relative;}
+    .page-guide{position:absolute;top:8px;right:8px;width:auto;min-width:0;background:var(--void-2);border:1px solid var(--border);border-radius:999px;pointer-events:none;z-index:6;box-shadow:0 4px 14px rgba(0,0,0,0.3);}
+    .page-guide-list{display:none;}
+    .page-guide-current{padding:4px 10px;font-size:10.5px;border:none;white-space:nowrap;}
+    /* cabecera que se esconde al escribir/desplazar el documento */
+    body.chrome-hidden .topbar, body.chrome-hidden .doc-subheader{display:none;}
+    #chromeToggle{display:none;position:fixed;bottom:calc(env(safe-area-inset-bottom) + 22px);right:14px;z-index:40;width:38px;height:38px;border-radius:50%;padding:0;align-items:center;justify-content:center;background:var(--panel-strong);border:1px solid var(--border);box-shadow:0 6px 18px rgba(0,0,0,0.35);}
+    body.chrome-hidden #chromeToggle{display:flex;}
+    .page-guide{top:auto;bottom:calc(env(safe-area-inset-bottom) + 28px);right:auto;left:14px;opacity:.9;}
+    #menuRecents{display:none;}
+    .app-menu-dropdown{max-width:86vw;}
+  }
+
+  /* ===== Lienzo A4 definitivo: Courier 12 pt = 16 px, 60 columnas, 57 líneas, 1 línea = 16 px ===== */
+  @media (min-width: 821px){
+    .script-page-wrap{overflow:auto;justify-content:flex-start;}
+    .script-page-wrap > .script-page{margin:0 auto;}
+    .script-page{
+      width:var(--pg-w,794px);max-width:none;flex-shrink:0;min-height:var(--pg-h,1123px);box-sizing:border-box;
+      padding:96px var(--pg-right,74px) var(--pg-bottom,115px) 144px;font-size:16px;line-height:16px;
+    }
+    .sp-block{padding:0 4px;margin:16px -4px 0 -4px;min-height:16px;line-height:16px;border-radius:0;max-width:none;}
+    .sp-heading,.sp-action,.sp-note,.sp-character,.sp-transition{margin-top:16px;}
+    .sp-character{margin-left:calc(22ch - 4px);}
+    .sp-parenthetical{margin-left:calc(16ch - 4px);width:calc(25ch + 8px);}
+    .sp-dialogue{margin-left:calc(10ch - 4px);width:calc(35ch + 8px);margin-bottom:0;}
+    .sp-character + .sp-parenthetical,.sp-character + .sp-dialogue,.sp-parenthetical + .sp-parenthetical,.sp-parenthetical + .sp-dialogue{margin-top:0;}
+    .script-page > :first-child{margin-top:0;}
+    .page-break-marker + *{margin-top:0 !important;}
+    .page-break-marker{height:auto;margin:0 calc(-1 * var(--pg-right,74px)) 0 -144px;background:transparent;box-shadow:none;position:relative;user-select:none;-webkit-user-select:none;}
+    .page-break-marker .pb-gap{height:28px;background:var(--void-2);box-shadow:inset 0 9px 10px -8px rgba(0,0,0,.35), inset 0 -9px 10px -8px rgba(0,0,0,.35);}
+    .page-break-marker .pb-top{height:96px;position:relative;}
+    .page-break-marker .pb-top span{position:absolute;left:auto;top:35px;right:var(--pg-right,74px);transform:none;background:none;border:none;padding:0;border-radius:0;
+      font-family:'Courier Prime',monospace;font-size:16px;line-height:16px;color:#17140f;letter-spacing:0;}
+    .doc-beat-divider{margin:16px -4px 0 -4px;padding:0 4px;border:none;height:16px;line-height:16px;text-align:center;
+      font-family:'Courier Prime',monospace;font-size:16px;font-weight:700;letter-spacing:0;color:#17140f;text-transform:uppercase;user-select:none;-webkit-user-select:none;}
+    .doc-beat-divider:first-child{margin-top:0;padding-top:0;}
+  }
+  .sp-character.contd::after{content:" (CONT'D)";}
+  .paper-select{background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:4px 6px;font:inherit;font-size:12px;cursor:pointer;}
+  @media (max-width: 820px){
+    .script-page{width:100%;max-width:none;zoom:1 !important;}
+    .page-break-marker{display:none;}
+    .doc-beat-divider{margin:14px 0 4px 0;}
+  }
+
+  /* números de escena (guion de rodaje) y línea gris de ayuda sobre cada escena: solo en pantalla */
+  @media (min-width: 821px){
+    .sp-heading{position:relative;border-top:1px solid rgba(0,0,0,.16);margin-top:15px;margin-bottom:-1px;}
+    .page-break-marker + .sp-heading,.script-page > .sp-heading:first-child{border-top-color:transparent;}
+    .sp-heading[data-scene]::before,.sp-heading[data-scene]::after{content:attr(data-scene);position:absolute;top:0;font-weight:400;color:#17140f;}
+    .sp-heading[data-scene]::before{left:-68px;}
+    .sp-heading[data-scene]::after{left:calc(100% + 4px);}
+  }
+  @media (max-width: 820px){ .sp-heading[data-scene]::before,.sp-heading[data-scene]::after{display:none;} }
+
+  /* ===== barras compactas (escritorio) ===== */
+  @media (min-width: 821px){
+    .doc-subheader{gap:6px 14px;padding:5px 14px;}
+    .doc-subheader .doc-toggle{font-size:12px;gap:5px;white-space:nowrap;}
+    .doc-subheader .doc-stats{font-size:11.5px;white-space:nowrap;}
+    .doc-subheader button{padding:4px 9px;font-size:12px;white-space:nowrap;}
+    .doc-subheader .paper-select{padding:2px 4px;font-size:12px;}
+    .script-toolbar{padding:4px 14px;gap:5px;flex-wrap:nowrap;overflow:hidden;}
+    .script-toolbar button{font-size:11px;padding:3px 9px;white-space:nowrap;flex-shrink:0;}
+    .script-toolbar .hint{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;text-align:right;font-size:10px;}
+    .script-modal-header{padding:7px 16px;gap:10px;}
+    .script-modal-title{font-size:17px;}
+  }
+</style>
+</head>
+<body>
+<button class="ghost icon" id="chromeToggle" title="Mostrar menú">☰</button>
+<div class="app">
+
+  <header class="topbar">
+    <div class="brand"><img src="icon.png" class="brand-icon" alt="ARC">ARC <span class="sub">// guion &amp; estructura</span></div>
+
+    <div class="app-menu" id="appMenu">
+      <div class="app-menu-item" data-menu="file">
+        Archivo
+        <div class="app-menu-dropdown" id="menuFile">
+          <button data-action="save">Guardar <span class="menu-shortcut">Ctrl+S</span></button>
+          <button data-action="saveas">Guardar como…</button>
+          <button data-action="open">Abrir…</button>
+          <button data-action="export">Exportar .arc a Archivos…</button>
+          <div class="app-menu-sep"></div>
+          <div class="app-menu-sub" id="menuRecents">
+            <span class="app-menu-sub-label">Recientes ▸</span>
+            <div class="app-menu-dropdown app-menu-flyout" id="menuRecentsList">
+              <span class="app-menu-empty" id="menuRecentsEmpty">Sin proyectos recientes</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="app-menu-item" data-menu="prefs">
+        Preferencias
+        <div class="app-menu-dropdown" id="menuPrefs">
+          <span class="app-menu-sub-label" style="padding:8px 14px 2px;">Tema</span>
+          <button data-action="theme-dark">● Oscuro</button>
+          <button data-action="theme-light">○ Claro</button>
+        </div>
+      </div>
+    </div>
+    <button class="ghost icon" id="btnExpandLeftSidebar" title="Proyectos recientes" style="display:none;">☰</button>
+    <div class="project-name mono" id="projectNameLabel">Proyecto sin guardar</div>
+
+    <div class="ws-switch" id="wsSwitch">
+      <button class="ws-btn active" data-view="beats">📋 Beats</button>
+      <button class="ws-btn" data-view="mood">🎨 Moodboard</button>
+      <button class="ws-btn" data-view="doc">📖 Documento</button>
+    </div>
+    <div class="toolbar" id="toolbarBeats">
+      <button class="primary" id="btnNew">＋ Beat</button>
+      <button id="btnConnect">⤳ Conectar</button>
+      <button id="btnGroup">▤ Agrupar por acto</button>
+      <input type="text" id="search" placeholder="Buscar título, prop, palabra…">
+      <div class="spacer"></div>
+      <button id="btnGuide">🧭 Guía del héroe</button>
+      <button class="ghost icon" id="btnExport" title="Exportar copia .json">⬇</button>
+      <button class="ghost icon" id="btnImportBtn" title="Importar copia .json">⬆</button>
+      <input type="file" id="fileImport" hidden accept=".arc,.json">
+      <button class="ghost icon" id="btnToggleSidebar" title="Mostrar/ocultar panel">▥</button>
+    </div>
+    <div class="toolbar hidden" id="toolbarMood">
+      <button class="primary" id="btnNewMood">＋ Referencia</button>
+      <div class="mood-filter-chips" id="moodFilterChips"></div>
+      <input type="text" id="moodSearch" placeholder="Buscar título o etiqueta…">
+      <div class="spacer"></div>
+    </div>
+  </header>
+
+  <div class="app-row" id="appRow">
+    <aside class="left-sidebar" id="leftSidebar">
+      <div class="left-sidebar-head">
+        <span class="section-title" style="margin:0;">Proyectos recientes</span>
+        <button class="ghost icon" id="btnCollapseLeftSidebar" title="Ocultar">◂</button>
+      </div>
+      <div class="left-sidebar-actions">
+        <button class="primary" id="btnLeftNewProject">＋ Nuevo</button>
+        <button id="btnLeftOpenProject">Abrir…</button>
+      </div>
+      <div class="left-sidebar-list" id="leftSidebarList"></div>
+    </aside>
+    <div class="app-views" id="appViews">
+
+  <main class="workspace" id="workspaceBeats">
+    <div class="canvas-wrap" id="canvasWrap">
+      <div id="canvas">
+        <svg id="connLayer"><defs>
+          <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto">
+            <path d="M0,0 L8,4 L0,8 Z" fill="var(--conn)"></path>
+          </marker>
+        </defs></svg>
+        <div id="lanesLayer"></div>
+        <div id="cardsLayer"></div>
+      </div>
+
+      <div class="connect-banner" id="connectBanner">
+        <span id="connectBannerText">Modo conexión: elige la tarjeta de origen</span>
+        <button id="btnConnectCancel">Salir ✕</button>
+      </div>
+
+      <div class="filter-banner" id="filterBanner">
+        <span class="dot" id="filterDot"></span>
+        <span id="filterText"></span>
+        <button id="btnClearFilter">Quitar filtro</button>
+      </div>
+
+      <div class="empty-state" id="emptyState">
+        <img src="icon.png" style="width:52px;height:52px;border-radius:12px;" alt="ARC">
+        <h1>¡Acción!</h1>
+        <p>Tu tablero está vacío. Añade tu primer beat dramático o revisa la guía del viaje del héroe para arrancar la estructura.</p>
+        <div class="actions">
+          <button class="primary" id="btnEmptyNew">＋ Crear primer beat</button>
+          <button id="btnEmptyGuide">🧭 Ver guía</button>
+        </div>
+      </div>
+
+      <div class="zoom-controls">
+        <button id="zoomOut">－</button>
+        <button id="zoomReset" style="width:auto;padding:0 10px;font-size:11px;" class="mono">100%</button>
+        <button id="zoomIn">＋</button>
+      </div>
+    </div>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="tabs">
+        <div class="tab active" data-tab="guide">Guía</div>
+        <div class="tab" data-tab="characters">Personajes</div>
+        <div class="tab" data-tab="development">Desarrollo</div>
+        <div class="tab" data-tab="locations">Localizaciones</div>
+        <div class="tab" data-tab="props">Props</div>
+        <div class="tab" data-tab="antagonism">Antagonismo</div>
+      </div>
+
+      <div class="tab-content active" id="tab-guide">
+        <p class="section-title">El viaje del héroe · 12 pasos</p>
+        <div id="guideList"></div>
+      </div>
+
+      <div class="tab-content" id="tab-characters">
+        <p class="section-title">Personajes</p>
+        <div id="characterList"></div>
+        <div class="add-row">
+          <input type="text" id="newCharacterInput" placeholder="Nombre del personaje…">
+          <button id="btnAddCharacter">Añadir</button>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-development">
+        <p class="section-title">Construcción de personaje</p>
+        <p class="tab-intro">Ficha rápida para dar profundidad a tus personajes. La tensión entre el <strong>deseo</strong> (lo que persigue) y la <strong>necesidad</strong> (lo que en verdad debe aprender) es lo que suele sostener el arco.</p>
+        <div id="developmentList"></div>
+      </div>
+
+      <div class="tab-content" id="tab-locations">
+        <p class="section-title">Localizaciones</p>
+        <div id="locationList"></div>
+        <div class="add-row">
+          <input type="text" id="newLocationInput" placeholder="Nombre de la localización…">
+          <button id="btnAddLocation">Añadir</button>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-props">
+        <p class="section-title">Props usados en el tablero</p>
+        <div class="prop-cloud" id="propCloud"></div>
+      </div>
+
+      <div class="tab-content" id="tab-antagonism">
+        <p class="section-title">Principio de antagonismo</p>
+        <p class="tab-intro">Una historia solo es tan fuerte como la fuerza que se opone a su protagonista. Usa estas ideas para revisar el conflicto de tus beats o crear directamente uno nuevo de confrontación.</p>
+        <div id="antagonismList"></div>
+      </div>
+    </aside>
+  </main>
+
+  <main class="workspace hidden" id="workspaceMood">
+    <div class="canvas-wrap" id="moodCanvasWrap">
+      <div id="moodCanvas">
+        <div id="moodCardsLayer"></div>
+      </div>
+
+      <div class="empty-state" id="moodEmptyState">
+        <img src="icon.png" style="width:52px;height:52px;border-radius:12px;" alt="ARC">
+        <h1>Moodboard</h1>
+        <p>Tu pizarra de referencias visuales está vacía. Sube fotos de iluminación, estilo, personajes, worldbuilding, props o extras.</p>
+        <div class="actions">
+          <button class="primary" id="btnEmptyMoodNew">＋ Añadir referencia</button>
+        </div>
+      </div>
+
+      <div class="zoom-controls">
+        <button id="moodZoomOut">－</button>
+        <button id="moodZoomReset" style="width:auto;padding:0 10px;font-size:11px;" class="mono">100%</button>
+        <button id="moodZoomIn">＋</button>
+      </div>
+    </div>
+  </main>
+
+  <main class="workspace workspace-doc hidden" id="workspaceDoc">
+    <div class="doc-subheader">
+      <div class="doc-stats mono" id="docStats">0 beats · 0.0 pág</div>
+      <label class="doc-toggle"><input type="checkbox" id="docShowLabelsToggle" checked> Beat de origen</label>
+      <label class="doc-toggle"><input type="checkbox" id="docContdToggle" checked> (CONT'D) auto</label>
+      <label class="doc-toggle" title="Números de escena a ambos lados, fuera de los márgenes (guion de rodaje)"><input type="checkbox" id="docSceneNumToggle"> Nº escenas</label>
+      <label class="doc-toggle" title="Papel">📄 <select id="paperSelectDoc" class="paper-select"><option value="a4">A4</option><option value="letter">Carta</option></select></label>
+      <div class="spacer"></div>
+      <button class="ghost" id="btnExportDocTxt" title="Exportar como texto (.txt)">⬇ .txt</button>
+      <button class="ghost" id="btnPrintDoc" title="Exportar PDF">📄 PDF</button>
+    </div>
+    <div class="script-toolbar" id="docToolbar"></div>
+    <div class="doc-body">
+      <div class="script-page-wrap" id="docPageWrap">
+        <div class="script-page" id="docPage"></div>
+      </div>
+      <aside class="page-guide" id="pageGuide">
+        <div class="page-guide-current" id="pageGuideCurrent">—</div>
+        <div class="page-guide-list" id="pageGuideList"></div>
+      </aside>
+    </div>
+  </main>
+
+    </div>
+  </div>
+
+  <div class="launcher-screen" id="launcherScreen">
+    <div class="launcher-inner">
+      <img src="icon.png" class="launcher-logo" alt="ARC">
+      <h1>ARC</h1>
+      <p class="launcher-sub">Guion &amp; estructura narrativa</p>
+      <div id="launcherRecovery" style="width:100%;"></div>
+      <div class="launcher-actions">
+        <button class="primary" id="btnLauncherNew">＋ Nuevo proyecto</button>
+        <button id="btnLauncherOpen">Abrir…</button>
+      </div>
+      <div class="launcher-recents">
+        <p class="section-title">Recientes</p>
+        <div id="launcherRecentsList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="beatModal">
+    <h2 id="modalTitle">Nuevo beat</h2>
+    <div class="field">
+      <label>Título</label>
+      <input type="text" id="fTitle" placeholder="Ej: El detective encuentra la primera pista">
+    </div>
+    <div class="field">
+      <label>Descripción</label>
+      <textarea id="fDesc" placeholder="¿Qué ocurre en este beat?"></textarea>
+    </div>
+    <div class="field">
+      <label>Acto</label>
+      <div class="act-picker" id="actPicker"></div>
+    </div>
+    <div class="field">
+      <label>Paso del viaje del héroe (opcional)</label>
+      <select id="fHeroStep"><option value="">— Ninguno —</option></select>
+    </div>
+    <div class="field">
+      <label>Principio de antagonismo (opcional)</label>
+      <select id="fAntagonism"><option value="">— Ninguno —</option></select>
+    </div>
+    <div class="field">
+      <label>Personajes</label>
+      <div class="chip-select" id="characterPicker"></div>
+    </div>
+    <div class="field">
+      <label>Localización</label>
+      <div class="chip-select" id="locationPicker"></div>
+    </div>
+    <div class="field">
+      <label>Props (separados por comas)</label>
+      <input type="text" id="fProps" placeholder="pistola, carta, reloj roto…">
+    </div>
+    <div class="field">
+      <label>Duración objetivo (páginas ≈ min)</label>
+      <input type="text" inputmode="decimal" id="fTargetPages" placeholder="Ej: 1.5">
+    </div>
+    <div class="modal-footer">
+      <button class="danger ghost" id="btnDeleteBeat" style="display:none;">Eliminar beat</button>
+      <div style="display:flex;gap:8px;margin-left:auto;">
+        <button id="btnCancelModal">Cancelar</button>
+        <button class="primary" id="btnSaveBeat">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="scriptModalOverlay">
+  <div class="modal script-modal" id="scriptModal">
+    <div class="script-modal-header">
+      <div>
+        <div class="script-modal-title" id="scriptModalTitle">Guion</div>
+        <div class="script-modal-sub mono" id="scriptStats">0.0 pág</div>
+      </div>
+      <div class="script-target-field">
+        <label>Objetivo (pág)</label>
+        <input type="text" inputmode="decimal" id="scriptTargetInput" value="1">
+      </div>
+      <select id="paperSelectScript" class="paper-select" title="Papel"><option value="a4">A4</option><option value="letter">Carta</option></select>
+      <button class="ghost icon" id="btnPrintScript" title="Exportar PDF">📄</button>
+      <button class="ghost icon" id="btnClearScript" title="Vaciar el guion de esta tarjeta">🗑️</button>
+      <button class="ghost icon" id="btnCloseScript">✕</button>
+    </div>
+    <div class="script-toolbar" id="scriptToolbar"></div>
+    <div class="script-page-wrap">
+      <div class="script-page" id="scriptPage"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="moodModalOverlay">
+  <div class="modal" id="moodModal">
+    <h2 id="moodModalTitle">Nueva referencia</h2>
+    <div class="field">
+      <label>Imagen</label>
+      <div class="mood-upload-row">
+        <button type="button" id="btnMoodUpload">Subir imagen…</button>
+        <input type="file" id="moodFileInput" accept="image/*" hidden>
+        <span class="mood-upload-status" id="moodUploadStatus">Ninguna seleccionada</span>
+      </div>
+      <input type="text" id="mImageUrl" placeholder="…o pega una URL de imagen" style="margin-top:8px;width:100%;">
+      <div class="mood-preview-wrap" id="moodPreviewWrap" style="display:none;"><img id="moodPreviewImg" alt=""></div>
+    </div>
+    <div class="field">
+      <label>Categoría</label>
+      <div class="chip-select" id="moodCategoryPicker"></div>
+    </div>
+    <div class="field">
+      <label>Título / nota</label>
+      <input type="text" id="mCaption" placeholder="Ej: Paleta fría para el clímax">
+    </div>
+    <div class="field">
+      <label>Etiquetas (separadas por comas)</label>
+      <input type="text" id="mTags" placeholder="neón, contraluz, lluvia…">
+    </div>
+    <div class="modal-footer">
+      <button class="danger ghost" id="btnDeleteMood" style="display:none;">Eliminar</button>
+      <div style="display:flex;gap:8px;margin-left:auto;">
+        <button id="btnCancelMood">Cancelar</button>
+        <button class="primary" id="btnSaveMood">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="printMount"></div>
+<div class="char-autocomplete" id="charAutocomplete"></div>
+
+<div class="toast" id="toast">
+  <span id="toastText"></span>
+  <button id="toastUndo" style="display:none;">Deshacer</button>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ===================== DATA ===================== */
+  const ACTS = [
+    {id:'I',   name:'Acto I',   color:'#4fd1c5'},
+    {id:'II',  name:'Acto II',  color:'#e8a33d'},
+    {id:'III', name:'Acto III', color:'#ff6b5e'},
+  ];
+  const NO_ACT_COLOR = '#6b6e76';
+  const PALETTE = ['#4fd1c5','#e8a33d','#ff6b5e','#8b7fd6','#5ec8ff','#f2b84b','#7fe0a3','#ff8fb0','#c792ea','#6fd3f7'];
+
+  const HERO_STEPS = [
+    {id:1, act:'I',  title:'Mundo ordinario', desc:'Presentamos al héroe en su entorno habitual, antes de que todo cambie.'},
+    {id:2, act:'I',  title:'Llamada a la aventura', desc:'Algo perturba el equilibrio: un problema, una invitación, una amenaza.'},
+    {id:3, act:'I',  title:'Rechazo de la llamada', desc:'El héroe duda o se resiste, por miedo o por apego a lo conocido.'},
+    {id:4, act:'I',  title:'Encuentro con el mentor', desc:'Alguien le da herramientas, consejo o confianza para seguir adelante.'},
+    {id:5, act:'I',  title:'Cruce del primer umbral', desc:'El héroe deja el mundo ordinario y se compromete con la aventura.'},
+    {id:6, act:'II', title:'Pruebas, aliados y enemigos', desc:'Explora el nuevo mundo, aprende sus reglas y forma vínculos clave.'},
+    {id:7, act:'II', title:'Acercamiento a la caverna profunda', desc:'Se prepara para el desafío central; sube la tensión.'},
+    {id:8, act:'II', title:'Prueba difícil (odisea)', desc:'El momento más duro: enfrenta su mayor miedo o al antagonista.'},
+    {id:9, act:'II', title:'Recompensa', desc:'Obtiene lo que buscaba, pero el precio o la victoria son ambiguos.'},
+    {id:10,act:'III',title:'El camino de vuelta', desc:'Decide regresar, aunque el conflicto todavía no está resuelto.'},
+    {id:11,act:'III',title:'Resurrección', desc:'Clímax final: una última prueba que lo transforma de verdad.'},
+    {id:12,act:'III',title:'Regreso con el elixir', desc:'Vuelve transformado, trayendo algo de valor para su mundo.'},
+  ];
+
+  const ANTAGONISM_TIPS = [
+    {id:1, color:'#ff6b5e', title:'El principio central', desc:'Un protagonista solo es tan fuerte, listo e interesante como las fuerzas que lo obligan a serlo. Antes de subir la tensión de tu héroe, sube la del antagonismo.'},
+    {id:2, color:'#e8a33d', title:'Antagonista con lógica propia', desc:'Nadie se cree el villano de su propia historia. Dale una razón legítima desde su punto de vista y, si puedes, una escena donde se entienda.'},
+    {id:3, color:'#4fd1c5', title:'Antagonismo institucional', desc:'Sistemas, leyes, jerarquías o normas culturales que se oponen al protagonista sin necesidad de un villano individual.'},
+    {id:4, color:'#8b7fd6', title:'Antagonismo del entorno', desc:'El tiempo, la naturaleza, la enfermedad o el azar: fuerzas impersonales que generan un conflicto igual de legítimo.'},
+    {id:5, color:'#5ec8ff', title:'El enemigo interior', desc:'El miedo, la herida o la contradicción del propio protagonista: a menudo el antagonismo más difícil de vencer.'},
+    {id:6, color:'#ff8fb0', title:'Escalada progresiva', desc:'Cada acto debería subir el coste de la oposición, obligando a decisiones cada vez más caras para el protagonista.'},
+    {id:7, color:'#f2b84b', title:'Frentes combinados', desc:'Combina 2-3 tipos de antagonismo (personal + institucional + interno) para dar textura y evitar un conflicto plano.'},
+    {id:8, color:'#7fe0a3', title:'El test de necesidad', desc:'¿Podría el protagonista resolver esto fácilmente si esta fuerza no existiera? Si la respuesta es sí, el antagonismo es débil.'},
+  ];
+  const DEV_FIELDS = [
+    {key:'want',  label:'Deseo (objetivo consciente)',        ph:'¿Qué cree que quiere?'},
+    {key:'need',  label:'Necesidad (verdad que debe aprender)',ph:'¿Qué le falta de verdad?'},
+    {key:'wound', label:'Herida / origen',                     ph:'¿Qué le ocurrió antes de la historia?'},
+    {key:'fear',  label:'Miedo',                                ph:'¿Qué evita a toda costa?'},
+    {key:'flaw',  label:'Contradicción / defecto',              ph:'¿Qué lo sabotea a sí mismo?'},
+    {key:'arc',   label:'Arco',                                 ph:'¿Cómo cambia de principio a fin?'},
+  ];
+  let LINES_PER_PAGE = 57; // se ajusta según el papel (≈ 1 página = 1 minuto)
+  /* Papel: texto siempre 60 columnas (6") con margen izquierdo 1,5"; 1 línea = 12 pt = 16 px */
+  const PAPERS = {
+    a4:     {label:'A4',                w:794, h:1123, right:74, bottom:115, lines:57, pw:595.28, ph:841.89},
+    letter: {label:'Carta (US Letter)', w:816, h:1056, right:96, bottom:96,  lines:54, pw:612,    ph:792},
+  };
+  let PAPER = PAPERS.a4;
+  const BLOCK_TYPES = [
+    {key:'heading', label:'Escena'},
+    {key:'action', label:'Acción'},
+    {key:'note', label:'Indicación'},
+    {key:'character', label:'Personaje'},
+    {key:'parenthetical', label:'Acotación'},
+    {key:'dialogue', label:'Diálogo'},
+    {key:'transition', label:'Transición'},
+  ];
+  const TYPE_ORDER = BLOCK_TYPES.map(t=>t.key);
+  function nextTypeOnEnter(type, text){
+    const empty = !text || !text.trim();
+    if(type === 'action' && empty) return 'heading'; // doble Enter en Acción vacía -> nueva Escena
+    const map = {heading:'action', action:'action', character:'dialogue', parenthetical:'dialogue', dialogue:'action', transition:'heading', note:'action'};
+    return map[type] || 'action';
+  }
+  const BLOCK_WIDTH = {heading:60, action:60, note:60, character:9999, parenthetical:25, dialogue:35, transition:9999};
+  const BLOCK_SPACER_AFTER = {heading:1, action:1, note:1, character:0, parenthetical:0, dialogue:1, transition:1};
+  const BLOCK_PLACEHOLDER = {
+    heading:'INT./EXT. LUGAR — DÍA', action:'Describe la acción…', note:'Indicación en cursiva…', character:'NOMBRE DEL PERSONAJE',
+    parenthetical:'(acotación)', dialogue:'Diálogo…', transition:'CORTE A:'
+  };
+  const MOOD_CATEGORIES = [
+    {id:'lighting', name:'Iluminación', color:'#f2b84b'},
+    {id:'style', name:'Estilo', color:'#8b7fd6'},
+    {id:'characters', name:'Personajes', color:'#4fd1c5'},
+    {id:'worldbuilding', name:'Worldbuilding', color:'#5ec8ff'},
+    {id:'props', name:'Props', color:'#e8a33d'},
+    {id:'extras', name:'Extras', color:'#ff8fb0'},
+    {id:'other', name:'Otros', color:'#93959c'},
+  ];
+
+  let currentScriptBeatId = null;
+  let focusedBlockIndex = 0;
+
+  const expandedDev = new Set();
+  const moodCardEls = new Map();
+  let moodTemp = { category: null, uploadedSrc: null };
+
+  let state = {
+    nextBeatId: 1, nextConnId: 1, nextCharId: 1, nextLocId: 1,
+    beats: [],
+    connections: [],
+    characters: [],
+    locations: [],
+    connectMode: false,
+    connectSource: null,
+    grouped: false,
+    focus: null,       // {type:'character'|'location'|'prop'|'act', id, label, color}
+    searchTerm: '',
+    zoom: 1,
+    pan: {x: 40, y: 40},
+    editingBeatId: null,
+    moodCards: [],
+    moodSearchTerm: '',
+    moodCategoryFilter: null,
+    moodZoom: 1,
+    moodPan: {x: 40, y: 40},
+    editingMoodId: null,
+    docShowLabels: true,
+    paper: 'a4',
+    autoContd: true,
+    sceneNumbers: false,
+    currentProjectPath: null,
+  };
+
+  /* editing temp state for modal */
+  let modalTemp = { characters: new Set(), location: null };
+
+  /* ===================== DOM REFS ===================== */
+  const $ = (id) => document.getElementById(id);
+  const canvas = $('canvas'), canvasWrap = $('canvasWrap'), cardsLayer = $('cardsLayer'),
+        lanesLayer = $('lanesLayer'), connLayer = $('connLayer'), emptyState = $('emptyState'),
+        connectBanner = $('connectBanner'), filterBanner = $('filterBanner');
+  const moodCanvas = $('moodCanvas'), moodCanvasWrap = $('moodCanvasWrap'), moodCardsLayer = $('moodCardsLayer'),
+        moodEmptyState = $('moodEmptyState');
+
+  const cardEls = new Map(); // beatId -> element
+
+  /* ===================== UTIL ===================== */
+  function uid(prefix){ return prefix + Date.now().toString(36) + Math.floor(Math.random()*1000); }
+  function actColor(actId){ const a = ACTS.find(x=>x.id===actId); return a ? a.color : NO_ACT_COLOR; }
+  function actName(actId){ const a = ACTS.find(x=>x.id===actId); return a ? a.name : 'Sin asignar'; }
+  function nextPaletteColor(index){ return PALETTE[index % PALETTE.length]; }
+  function findChar(id){ return state.characters.find(c=>c.id===id); }
+  function findLoc(id){ return state.locations.find(l=>l.id===id); }
+  function beatCardId(beat){
+    const idx = state.beats.findIndex(b=>b.id===beat.id);
+    return 'B' + String(idx+1).padStart(2,'0');
+  }
+  function escapeHtml(str){
+    return (str||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  let toastTimer = null;
+  function showToast(text, undoFn){
+    const toast = $('toast'), undoBtn = $('toastUndo');
+    $('toastText').textContent = text;
+    undoBtn.style.display = undoFn ? 'inline-flex' : 'none';
+    undoBtn.onclick = () => { if(undoFn) undoFn(); hideToast(); };
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(hideToast, 5000);
+  }
+  function hideToast(){ $('toast').classList.remove('show'); }
+
+  /* ===================== CANVAS TRANSFORM ===================== */
+  function applyCanvasTransform(anim){
+    canvas.classList.toggle('no-anim', !anim);
+    canvas.style.transform = `translate(${state.pan.x}px, ${state.pan.y}px) scale(${state.zoom})`;
+    $('zoomReset').textContent = Math.round(state.zoom*100)+'%';
+  }
+
+  /* ===================== RENDER: LANES ===================== */
+  function layoutGroupedPositions(){
+    const laneW = 300, gap = 26, startX = 40, cardH = 190, cardGap = 26, startY = 90;
+    ACTS.concat([{id:null}]).forEach((act, i) => {
+      const beatsInAct = state.beats.filter(b => (b.act||null) === (act.id||null));
+      beatsInAct.forEach((b, j) => {
+        b.x = startX + i*(laneW+gap);
+        b.y = startY + j*(cardH+cardGap);
+      });
+    });
+  }
+
+  function renderLanes(){
+    lanesLayer.innerHTML = '';
+    if(!state.grouped){ return; }
+    const laneW = 300, gap = 26, startX = 40;
+    const allActs = ACTS.concat([{id:null,name:'Sin asignar',color:NO_ACT_COLOR}]);
+    allActs.forEach((act, i) => {
+      const lane = document.createElement('div');
+      lane.className = 'act-lane show';
+      lane.style.left = (startX + i*(laneW+gap) - 16) + 'px';
+      lane.style.width = (laneW+32) + 'px';
+      lane.style.height = '1420px';
+      const label = document.createElement('span');
+      label.className = 'lane-label';
+      label.textContent = act.name;
+      label.style.background = act.color + '22';
+      label.style.color = act.color;
+      lane.appendChild(label);
+      lanesLayer.appendChild(lane);
+    });
+  }
+
+  /* ===================== RENDER: CARDS ===================== */
+  function cardMatchesFilter(beat){
+    let visible = true;
+    if(state.searchTerm){
+      const t = state.searchTerm.toLowerCase();
+      const hay = [
+        beat.title, beat.desc,
+        ...(beat.characters.map(id => findChar(id)?.name||'')),
+        findLoc(beat.location)?.name || '',
+        ...(beat.props||[])
+      ].join(' ').toLowerCase();
+      if(!hay.includes(t)) visible = false;
+    }
+    if(visible && state.focus){
+      const f = state.focus;
+      if(f.type === 'character') visible = beat.characters.includes(f.id);
+      else if(f.type === 'location') visible = beat.location === f.id;
+      else if(f.type === 'prop') visible = (beat.props||[]).some(p => p.toLowerCase() === f.id.toLowerCase());
+      else if(f.type === 'act') visible = (beat.act||null) === f.id;
+    }
+    return visible;
+  }
+
+  function buildCardContent(el, beat){
+    // No reconstruir el contenido mientras el usuario está escribiendo
+    // directamente en el título o la descripción de esta misma tarjeta.
+    if(el.contains(document.activeElement) &&
+       (document.activeElement.classList.contains('card-title') || document.activeElement.classList.contains('card-desc'))){
+      return;
+    }
+    const color = actColor(beat.act);
+    const step = HERO_STEPS.find(s => s.id === beat.heroStep);
+    const antTip = ANTAGONISM_TIPS.find(t => t.id === beat.antagonism);
+    const scriptStats = computeScriptStats(beat.script || []);
+    let scriptBadgeHtml = '';
+    if(beat.targetPages || scriptStats.pages > 0){
+      const target = beat.targetPages || 0;
+      let cls = 'neutral';
+      if(target > 0){
+        const ratio = scriptStats.pages / target;
+        cls = ratio <= 1.15 ? 'ok' : (ratio <= 1.4 ? 'warn' : 'over');
+      }
+      scriptBadgeHtml = `<div class="script-badge script-badge-${cls}">🎬 ${scriptStats.pages.toFixed(1)}${target ? '/'+target.toFixed(1) : ''} pág</div>`;
+    }
+    el.innerHTML = `
+      <div class="card-bar" style="background:${color};"></div>
+      <div class="card-head">
+        <span class="card-id mono">${beatCardId(beat)}${beat.act ? ' · '+actName(beat.act) : ''}</span>
+        <div class="card-actions">
+          <button data-action="script" title="Desarrollar guion">🎬</button>
+          <button data-action="edit" title="Editar (personajes, acto, props…)">✎</button>
+          <button data-action="delete" title="Eliminar">✕</button>
+        </div>
+      </div>
+      <div class="card-title" contenteditable="true" spellcheck="false">${escapeHtml(beat.title)}</div>
+      <div class="card-desc" contenteditable="true" spellcheck="false" data-placeholder="Añade una descripción…">${escapeHtml(beat.desc)}</div>
+      ${step ? `<div class="card-step mono">PASO ${step.id} · ${escapeHtml(step.title)}</div>` : ''}
+      ${antTip ? `<div class="card-step mono" style="color:${antTip.color}">⚔ ${escapeHtml(antTip.title)}</div>` : ''}
+      ${scriptBadgeHtml}
+      <div class="chip-row"></div>
+      <div class="card-resize-handle" title="Arrastra para cambiar el ancho"></div>
+    `;
+    const titleEl = el.querySelector('.card-title');
+    const descEl = el.querySelector('.card-desc');
+    titleEl.oninput = () => { beat.title = titleEl.textContent; };
+    titleEl.onkeydown = (e) => { if(e.key === 'Enter'){ e.preventDefault(); descEl.focus(); } };
+    descEl.oninput = () => { beat.desc = descEl.textContent; };
+    attachCardResize(el, beat);
+    const chipRow = el.querySelector('.chip-row');
+    beat.characters.forEach(cid => {
+      const c = findChar(cid); if(!c) return;
+      const chip = document.createElement('span');
+      chip.className = 'chip';
+      chip.innerHTML = `<span class="dot" style="background:${c.color}"></span>${escapeHtml(c.name)}`;
+      chip.onclick = (e) => { e.stopPropagation(); setFocus({type:'character', id:c.id, label:c.name, color:c.color}); switchTab('characters'); };
+      chipRow.appendChild(chip);
+    });
+    if(beat.location){
+      const l = findLoc(beat.location);
+      if(l){
+        const chip = document.createElement('span');
+        chip.className = 'chip';
+        chip.innerHTML = `<span class="dot" style="background:${l.color}"></span>📍 ${escapeHtml(l.name)}`;
+        chip.onclick = (e) => { e.stopPropagation(); setFocus({type:'location', id:l.id, label:l.name, color:l.color}); switchTab('locations'); };
+        chipRow.appendChild(chip);
+      }
+    }
+    (beat.props||[]).forEach(p => {
+      const chip = document.createElement('span');
+      chip.className = 'chip prop';
+      chip.textContent = '#'+p;
+      chip.onclick = (e) => { e.stopPropagation(); setFocus({type:'prop', id:p, label:p, color:'#93959c'}); switchTab('props'); };
+      chipRow.appendChild(chip);
+    });
+
+    el.querySelector('[data-action="script"]').onclick = (e) => { e.stopPropagation(); openScriptModal(beat.id); };
+    el.querySelector('[data-action="edit"]').onclick = (e) => { e.stopPropagation(); openBeatModal(beat.id); };
+    el.querySelector('[data-action="delete"]').onclick = (e) => { e.stopPropagation(); deleteBeat(beat.id); };
+  }
+
+  function renderCards(){
+    const seen = new Set();
+    state.beats.forEach(beat => {
+      seen.add(beat.id);
+      let el = cardEls.get(beat.id);
+      if(!el){
+        el = document.createElement('div');
+        el.className = 'beat-card';
+        el.dataset.id = beat.id;
+        attachCardDrag(el, beat);
+        cardsLayer.appendChild(el);
+        cardEls.set(beat.id, el);
+      }
+      buildCardContent(el, beat);
+      el.style.left = beat.x + 'px';
+      el.style.top = beat.y + 'px';
+      el.style.width = (beat.cardWidth || DEFAULT_CARD_WIDTH) + 'px';
+
+      const visible = cardMatchesFilter(beat);
+      el.classList.toggle('dimmed', !(visible));
+      el.classList.toggle('connect-source', state.connectSource === beat.id);
+      el.classList.toggle('glow', !!(state.focus && visible && (state.focus.type!=='act')));
+      el.style.setProperty('--glow-color', state.focus ? state.focus.color : 'var(--teal)');
+      el.style.cursor = state.grouped ? 'pointer' : 'grab';
+    });
+    // remove deleted
+    for(const [id, el] of cardEls){
+      if(!seen.has(id)){ el.remove(); cardEls.delete(id); }
+    }
+    emptyState.classList.toggle('hide', state.beats.length > 0);
+  }
+
+  /* ===================== RENDER: CONNECTIONS ===================== */
+  function rectAnchor(cx, cy, hw, hh, dx, dy){
+    if(dx===0 && dy===0) return {x:cx, y:cy};
+    const tx = dx !== 0 ? Math.abs(hw/dx) : Infinity;
+    const ty = dy !== 0 ? Math.abs(hh/dy) : Infinity;
+    const t = Math.min(tx, ty);
+    return { x: cx + dx*t, y: cy + dy*t };
+  }
+
+  function renderConnections(){
+    // clear existing paths (keep defs)
+    Array.from(connLayer.querySelectorAll('path, circle')).forEach(n => n.remove());
+    const hDefault = 190; // altura aproximada, la real varía con el contenido
+
+    state.connections.forEach(conn => {
+      const a = state.beats.find(b=>b.id===conn.from);
+      const b = state.beats.find(b=>b.id===conn.to);
+      if(!a || !b) return;
+      const elA = cardEls.get(a.id), elB = cardEls.get(b.id);
+      const aw = elA ? elA.offsetWidth : (a.cardWidth || DEFAULT_CARD_WIDTH);
+      const bw = elB ? elB.offsetWidth : (b.cardWidth || DEFAULT_CARD_WIDTH);
+      const ah = elA ? elA.offsetHeight : hDefault, bh = elB ? elB.offsetHeight : hDefault;
+      const acx = a.x + aw/2, acy = a.y + ah/2;
+      const bcx = b.x + bw/2, bcy = b.y + bh/2;
+      const dx = bcx - acx, dy = bcy - acy;
+      const p1 = rectAnchor(acx, acy, aw/2, ah/2, dx, dy);
+      const p2 = rectAnchor(bcx, bcy, bw/2, bh/2, -dx, -dy);
+      const midX = (p1.x+p2.x)/2, midY = (p1.y+p2.y)/2 - 46;
+      const d = `M ${p1.x} ${p1.y} Q ${midX} ${midY} ${p2.x} ${p2.y}`;
+
+      const dim = (a.__vis === false || b.__vis === false);
+
+      const hit = document.createElementNS('http://www.w3.org/2000/svg','path');
+      hit.setAttribute('d', d); hit.setAttribute('class','hit');
+      hit.setAttribute('stroke','transparent'); hit.setAttribute('stroke-width','16'); hit.setAttribute('fill','none');
+      hit.onclick = () => deleteConnection(conn.id);
+      connLayer.appendChild(hit);
+
+      const vis = document.createElementNS('http://www.w3.org/2000/svg','path');
+      vis.setAttribute('d', d); vis.setAttribute('class','visible');
+      vis.setAttribute('stroke','var(--conn)'); vis.setAttribute('stroke-width','2');
+      vis.setAttribute('fill','none'); vis.setAttribute('marker-end','url(#arrow)');
+      vis.style.opacity = dim ? '0.15' : '0.85';
+      vis.style.filter = 'drop-shadow(0 0 3px rgba(var(--teal-rgb),0.35))';
+      connLayer.appendChild(vis);
+    });
+  }
+
+  function markVisibility(){
+    state.beats.forEach(b => { b.__vis = cardMatchesFilter(b); });
+  }
+
+  /* ===================== FULL RENDER ===================== */
+  function render(){
+    markVisibility();
+    if(state.grouped) layoutGroupedPositions();
+    renderLanes();
+    renderCards();
+    renderConnections();
+    renderSidebar();
+    updateBanners();
+  }
+
+  /* ===================== DRAG: CARDS ===================== */
+  function attachCardDrag(el, beatRef){
+    let dragging = false, startX=0, startY=0, origX=0, origY=0, moved=false;
+    el.addEventListener('mousedown', (e) => {
+      if(e.target.closest('.card-actions') || e.target.closest('.chip') || e.target.closest('.card-title') || e.target.closest('.card-desc') || e.target.closest('.card-resize-handle')) return;
+      const beat = state.beats.find(b=>b.id===el.dataset.id);
+      if(state.connectMode){
+        handleConnectClick(beat.id);
+        return;
+      }
+      if(state.grouped){
+        openBeatModal(beat.id);
+        return;
+      }
+      dragging = true; moved = false;
+      startX = e.clientX; startY = e.clientY;
+      origX = beat.x; origY = beat.y;
+      el.classList.add('dragging','no-anim');
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', (e) => {
+      if(!dragging) return;
+      const dx = (e.clientX - startX) / state.zoom;
+      const dy = (e.clientY - startY) / state.zoom;
+      if(Math.abs(dx) > 2 || Math.abs(dy) > 2) moved = true;
+      const beat = state.beats.find(b=>b.id===el.dataset.id);
+      beat.x = origX + dx; beat.y = origY + dy;
+      el.style.left = beat.x + 'px'; el.style.top = beat.y + 'px';
+      renderConnections();
+    });
+    document.addEventListener('mouseup', () => {
+      if(!dragging) return;
+      dragging = false;
+      el.classList.remove('dragging','no-anim');
+      if(!moved){
+        // simple click without drag -> do nothing (edit is via pencil icon)
+      }
+    });
+  }
+
+  const DEFAULT_CARD_WIDTH = 250, MIN_CARD_WIDTH = 190, MAX_CARD_WIDTH = 560;
+
+  function attachCardResize(el, beat){
+    const handle = el.querySelector('.card-resize-handle');
+    if(!handle) return;
+    let resizing = false, startX = 0, startWidth = 0;
+    handle.addEventListener('mousedown', (e) => {
+      e.stopPropagation(); e.preventDefault();
+      resizing = true;
+      startX = e.clientX;
+      startWidth = beat.cardWidth || DEFAULT_CARD_WIDTH;
+      el.classList.add('no-anim');
+    });
+    document.addEventListener('mousemove', (e) => {
+      if(!resizing) return;
+      const dx = (e.clientX - startX) / state.zoom;
+      const w = Math.min(MAX_CARD_WIDTH, Math.max(MIN_CARD_WIDTH, startWidth + dx));
+      beat.cardWidth = Math.round(w);
+      el.style.width = beat.cardWidth + 'px';
+    });
+    document.addEventListener('mouseup', () => {
+      if(!resizing) return;
+      resizing = false;
+      el.classList.remove('no-anim');
+      renderConnections();
+    });
+  }
+
+  /* ===================== PAN & ZOOM ===================== */
+  (function initPanZoom(){
+    let panning = false, sx=0, sy=0, ox=0, oy=0;
+    canvasWrap.addEventListener('mousedown', (e) => {
+      if(e.target.closest('.beat-card')) return;
+      if(e.target.closest('.connect-banner') || e.target.closest('.filter-banner') || e.target.closest('.zoom-controls') || e.target.closest('.empty-state')) return;
+      panning = true; sx = e.clientX; sy = e.clientY; ox = state.pan.x; oy = state.pan.y;
+      canvasWrap.classList.add('panning');
+    });
+    document.addEventListener('mousemove', (e) => {
+      if(!panning) return;
+      state.pan.x = ox + (e.clientX - sx);
+      state.pan.y = oy + (e.clientY - sy);
+      applyCanvasTransform(false);
+    });
+    document.addEventListener('mouseup', () => { panning = false; canvasWrap.classList.remove('panning'); });
+
+    $('zoomIn').onclick = () => { state.zoom = Math.min(1.6, state.zoom + 0.1); applyCanvasTransform(true); };
+    $('zoomOut').onclick = () => { state.zoom = Math.max(0.45, state.zoom - 0.1); applyCanvasTransform(true); };
+    $('zoomReset').onclick = () => { state.zoom = 1; applyCanvasTransform(true); };
+
+    canvasWrap.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const rect = canvasWrap.getBoundingClientRect();
+      const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+      const canvasX = (mx - state.pan.x) / state.zoom;
+      const canvasY = (my - state.pan.y) / state.zoom;
+      const factor = Math.exp(-e.deltaY * 0.0012);
+      const newZoom = Math.min(1.6, Math.max(0.45, state.zoom * factor));
+      state.pan.x = mx - canvasX * newZoom;
+      state.pan.y = my - canvasY * newZoom;
+      state.zoom = newZoom;
+      applyCanvasTransform(false);
+    }, { passive: false });
+  })();
+
+  /* ===================== WORKSPACE SWITCH ===================== */
+  function switchWorkspace(view){
+    document.querySelectorAll('.ws-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+    $('toolbarBeats').classList.toggle('hidden', view !== 'beats');
+    $('toolbarMood').classList.toggle('hidden', view !== 'mood');
+    $('workspaceBeats').classList.toggle('hidden', view !== 'beats');
+    $('workspaceMood').classList.toggle('hidden', view !== 'mood');
+    $('workspaceDoc').classList.toggle('hidden', view !== 'doc');
+    if(view === 'mood'){ applyMoodCanvasTransform(false); renderMood(); }
+    if(view === 'doc'){ buildDocToolbar(); renderFullDocument(); }
+  }
+  document.querySelectorAll('.ws-btn').forEach(b => b.onclick = () => switchWorkspace(b.dataset.view));
+
+  /* ===================== MOODBOARD ===================== */
+  function applyMoodCanvasTransform(anim){
+    moodCanvas.classList.toggle('no-anim', !anim);
+    moodCanvas.style.transform = `translate(${state.moodPan.x}px, ${state.moodPan.y}px) scale(${state.moodZoom})`;
+    $('moodZoomReset').textContent = Math.round(state.moodZoom*100)+'%';
+  }
+
+  (function initMoodPanZoom(){
+    let panning = false, sx=0, sy=0, ox=0, oy=0;
+    moodCanvasWrap.addEventListener('mousedown', (e) => {
+      if(e.target.closest('.mood-card')) return;
+      if(e.target.closest('.zoom-controls') || e.target.closest('.empty-state')) return;
+      panning = true; sx = e.clientX; sy = e.clientY; ox = state.moodPan.x; oy = state.moodPan.y;
+      moodCanvasWrap.classList.add('panning');
+    });
+    document.addEventListener('mousemove', (e) => {
+      if(!panning) return;
+      state.moodPan.x = ox + (e.clientX - sx);
+      state.moodPan.y = oy + (e.clientY - sy);
+      applyMoodCanvasTransform(false);
+    });
+    document.addEventListener('mouseup', () => { panning = false; moodCanvasWrap.classList.remove('panning'); });
+
+    $('moodZoomIn').onclick = () => { state.moodZoom = Math.min(1.6, state.moodZoom + 0.1); applyMoodCanvasTransform(true); };
+    $('moodZoomOut').onclick = () => { state.moodZoom = Math.max(0.45, state.moodZoom - 0.1); applyMoodCanvasTransform(true); };
+    $('moodZoomReset').onclick = () => { state.moodZoom = 1; applyMoodCanvasTransform(true); };
+
+    moodCanvasWrap.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const rect = moodCanvasWrap.getBoundingClientRect();
+      const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+      const canvasX = (mx - state.moodPan.x) / state.moodZoom;
+      const canvasY = (my - state.moodPan.y) / state.moodZoom;
+      const factor = Math.exp(-e.deltaY * 0.0012);
+      const newZoom = Math.min(1.6, Math.max(0.45, state.moodZoom * factor));
+      state.moodPan.x = mx - canvasX * newZoom;
+      state.moodPan.y = my - canvasY * newZoom;
+      state.moodZoom = newZoom;
+      applyMoodCanvasTransform(false);
+    }, { passive: false });
+  })();
+
+  function makeMoodCard(partial){
+    const count = state.moodCards.length;
+    const cascadeX = 90 + (count % 5) * 50;
+    const cascadeY = 90 + Math.floor(count/5) * 40;
+    return Object.assign({
+      id: uid('mood'), src:'', caption:'', category:null, tags:[],
+      x: cascadeX + Math.random()*30, y: cascadeY + Math.random()*30,
+    }, partial);
+  }
+
+  function moodCardMatchesFilter(card){
+    let visible = true;
+    if(state.moodCategoryFilter) visible = card.category === state.moodCategoryFilter;
+    if(visible && state.moodSearchTerm){
+      const t = state.moodSearchTerm.toLowerCase();
+      const hay = [card.caption, ...(card.tags||[])].join(' ').toLowerCase();
+      if(!hay.includes(t)) visible = false;
+    }
+    return visible;
+  }
+
+  function buildMoodCardContent(el, card){
+    const cat = MOOD_CATEGORIES.find(c => c.id === card.category);
+    el.innerHTML = `
+      <div class="mood-img-wrap">
+        ${card.src ? `<img src="${card.src}" alt="">` : `<div class="mood-img-empty">Sin imagen</div>`}
+        ${cat ? `<span class="mood-cat-badge" style="background:${cat.color}22;color:${cat.color};border-color:${cat.color}55;">${escapeHtml(cat.name)}</span>` : ''}
+        <div class="mood-card-actions">
+          <button data-action="edit" title="Editar">✎</button>
+          <button data-action="delete" title="Eliminar">✕</button>
+        </div>
+      </div>
+      ${card.caption ? `<div class="mood-caption">${escapeHtml(card.caption)}</div>` : ''}
+      ${(card.tags && card.tags.length) ? `<div class="mood-tags">${card.tags.map(t=>`<span class="chip prop">#${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+    `;
+    el.querySelector('[data-action="edit"]').onclick = (e) => { e.stopPropagation(); openMoodModal(card.id); };
+    el.querySelector('[data-action="delete"]').onclick = (e) => { e.stopPropagation(); deleteMoodCard(card.id); };
+  }
+
+  function attachMoodCardDrag(el, cardRef){
+    let dragging = false, startX=0, startY=0, origX=0, origY=0;
+    el.addEventListener('mousedown', (e) => {
+      if(e.target.closest('.mood-card-actions')) return;
+      const card = state.moodCards.find(c => c.id === el.dataset.id);
+      dragging = true;
+      startX = e.clientX; startY = e.clientY;
+      origX = card.x; origY = card.y;
+      el.classList.add('dragging');
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', (e) => {
+      if(!dragging) return;
+      const dx = (e.clientX - startX) / state.moodZoom;
+      const dy = (e.clientY - startY) / state.moodZoom;
+      const card = state.moodCards.find(c => c.id === el.dataset.id);
+      card.x = origX + dx; card.y = origY + dy;
+      el.style.left = card.x + 'px'; el.style.top = card.y + 'px';
+    });
+    document.addEventListener('mouseup', () => { dragging = false; el.classList.remove('dragging'); });
+  }
+
+  function renderMood(){
+    const seen = new Set();
+    state.moodCards.forEach(card => {
+      seen.add(card.id);
+      let el = moodCardEls.get(card.id);
+      if(!el){
+        el = document.createElement('div');
+        el.className = 'mood-card';
+        el.dataset.id = card.id;
+        attachMoodCardDrag(el, card);
+        moodCardsLayer.appendChild(el);
+        moodCardEls.set(card.id, el);
+      }
+      buildMoodCardContent(el, card);
+      el.style.left = card.x + 'px'; el.style.top = card.y + 'px';
+      el.classList.toggle('dimmed', !moodCardMatchesFilter(card));
+    });
+    for(const [id, el] of moodCardEls){
+      if(!seen.has(id)){ el.remove(); moodCardEls.delete(id); }
+    }
+    moodEmptyState.classList.toggle('hide', state.moodCards.length > 0);
+  }
+
+  function deleteMoodCard(id){
+    const idx = state.moodCards.findIndex(c => c.id === id);
+    if(idx === -1) return;
+    const card = state.moodCards[idx];
+    state.moodCards.splice(idx, 1);
+    showToast('Referencia eliminada', () => { state.moodCards.splice(idx, 0, card); renderMood(); });
+    renderMood();
+  }
+
+  function buildMoodFilterChips(){
+    const wrap = $('moodFilterChips');
+    if(wrap.dataset.built) return;
+    const cats = [{id:null, name:'Todas', color:'#93959c'}, ...MOOD_CATEGORIES];
+    wrap.innerHTML = cats.map(c => `<span class="mood-chip active" data-cat="${c.id||''}" style="color:${c.color}"><span class="dot" style="background:${c.color}"></span>${escapeHtml(c.name)}</span>`).join('');
+    wrap.dataset.built = '1';
+    wrap.querySelectorAll('.mood-chip').forEach(chip => {
+      chip.onclick = () => {
+        const val = chip.dataset.cat || null;
+        state.moodCategoryFilter = (state.moodCategoryFilter === val) ? null : val;
+        updateMoodChipActive();
+        renderMood();
+      };
+    });
+    updateMoodChipActive();
+  }
+  function updateMoodChipActive(){
+    $('moodFilterChips').querySelectorAll('.mood-chip').forEach(ch => {
+      const val = ch.dataset.cat || null;
+      ch.classList.toggle('active', state.moodCategoryFilter === val);
+    });
+  }
+  $('moodSearch').addEventListener('input', (e) => { state.moodSearchTerm = e.target.value.trim(); renderMood(); });
+
+  /* ---- mood modal ---- */
+  function renderMoodCategoryPicker(){
+    const wrap = $('moodCategoryPicker');
+    wrap.innerHTML = '';
+    MOOD_CATEGORIES.forEach(c => {
+      const chip = document.createElement('span');
+      chip.className = 'chip-toggle' + (moodTemp.category === c.id ? ' on' : '');
+      chip.innerHTML = `<span class="dot" style="background:${c.color}"></span>${escapeHtml(c.name)}`;
+      chip.onclick = () => { moodTemp.category = (moodTemp.category === c.id) ? null : c.id; renderMoodCategoryPicker(); };
+      wrap.appendChild(chip);
+    });
+  }
+  function showMoodPreview(src){ $('moodPreviewImg').src = src; $('moodPreviewWrap').style.display = 'block'; }
+  function hideMoodPreview(){ $('moodPreviewWrap').style.display = 'none'; $('moodPreviewImg').src = ''; }
+
+  $('btnMoodUpload').onclick = () => $('moodFileInput').click();
+  $('moodFileInput').addEventListener('change', (e) => {
+    const file = e.target.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      moodTemp.uploadedSrc = reader.result;
+      $('moodUploadStatus').textContent = file.name;
+      $('mImageUrl').value = '';
+      showMoodPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  });
+  $('mImageUrl').addEventListener('input', () => {
+    const v = $('mImageUrl').value.trim();
+    if(v){ moodTemp.uploadedSrc = null; $('moodUploadStatus').textContent = 'Ninguna seleccionada'; showMoodPreview(v); }
+    else if(!moodTemp.uploadedSrc){ hideMoodPreview(); }
+  });
+
+  function openMoodModal(id){
+    state.editingMoodId = id || null;
+    const card = id ? state.moodCards.find(c => c.id === id) : null;
+    $('moodModalTitle').textContent = card ? 'Editar referencia' : 'Nueva referencia';
+    $('btnDeleteMood').style.display = card ? 'inline-flex' : 'none';
+    moodTemp.category = card ? card.category : null;
+    moodTemp.uploadedSrc = (card && card.src && card.src.startsWith('data:')) ? card.src : null;
+    $('mImageUrl').value = (card && card.src && !card.src.startsWith('data:')) ? card.src : '';
+    $('mCaption').value = card ? card.caption : '';
+    $('mTags').value = card ? (card.tags||[]).join(', ') : '';
+    $('moodUploadStatus').textContent = moodTemp.uploadedSrc ? 'Imagen cargada' : 'Ninguna seleccionada';
+    if(card && card.src) showMoodPreview(card.src); else hideMoodPreview();
+    renderMoodCategoryPicker();
+    $('moodModalOverlay').classList.add('show');
+  }
+  function closeMoodModal(){ $('moodModalOverlay').classList.remove('show'); state.editingMoodId = null; }
+
+  $('btnSaveMood').onclick = () => {
+    const src = moodTemp.uploadedSrc || $('mImageUrl').value.trim();
+    const caption = $('mCaption').value.trim();
+    const category = moodTemp.category;
+    const tags = $('mTags').value.split(',').map(s=>s.trim()).filter(Boolean);
+    if(state.editingMoodId){
+      const card = state.moodCards.find(c => c.id === state.editingMoodId);
+      Object.assign(card, {src, caption, category, tags});
+    } else {
+      state.moodCards.push(makeMoodCard({src, caption, category, tags}));
+    }
+    closeMoodModal();
+    renderMood();
+  };
+  $('btnCancelMood').onclick = closeMoodModal;
+  $('moodModalOverlay').addEventListener('mousedown', (e) => { if(e.target === $('moodModalOverlay')) closeMoodModal(); });
+  $('btnDeleteMood').onclick = () => { const id = state.editingMoodId; closeMoodModal(); deleteMoodCard(id); };
+  $('btnNewMood').onclick = () => openMoodModal(null);
+  $('btnEmptyMoodNew').onclick = () => openMoodModal(null);
+
+  /* ===================== CONNECT MODE ===================== */
+  function toggleConnectMode(on){
+    state.connectMode = (on !== undefined) ? on : !state.connectMode;
+    state.connectSource = null;
+    $('btnConnect').classList.toggle('active', state.connectMode);
+    canvasWrap.classList.toggle('connect-mode', state.connectMode);
+    updateBanners();
+    render();
+  }
+  function handleConnectClick(beatId){
+    if(!state.connectSource){
+      state.connectSource = beatId;
+    } else if(state.connectSource === beatId){
+      state.connectSource = null;
+    } else {
+      const exists = state.connections.some(c =>
+        (c.from===state.connectSource && c.to===beatId) || (c.from===beatId && c.to===state.connectSource));
+      if(!exists){
+        state.connections.push({id: uid('c'), from: state.connectSource, to: beatId});
+        showToast('Conexión creada');
+      }
+      state.connectSource = null;
+    }
+    updateBanners();
+    render();
+  }
+  function deleteConnection(id){
+    state.connections = state.connections.filter(c => c.id !== id);
+    showToast('Conexión eliminada');
+    render();
+  }
+  function updateBanners(){
+    connectBanner.classList.toggle('show', state.connectMode);
+    $('connectBannerText').textContent = state.connectSource
+      ? 'Elige la tarjeta de destino…'
+      : 'Modo conexión: elige la tarjeta de origen';
+
+    const f = state.focus;
+    filterBanner.classList.toggle('show', !!f);
+    if(f){
+      $('filterDot').style.background = f.color;
+      const typeLabel = {character:'Personaje', location:'Localización', prop:'Prop', act:'Acto'}[f.type];
+      $('filterText').textContent = `${typeLabel}: ${f.label}`;
+    }
+  }
+  $('btnConnect').onclick = () => toggleConnectMode();
+  $('btnConnectCancel').onclick = () => toggleConnectMode(false);
+
+  /* ===================== FOCUS / FILTER ===================== */
+  function setFocus(f){
+    state.focus = (state.focus && state.focus.type===f.type && state.focus.id===f.id) ? null : f;
+    render();
+  }
+  $('btnClearFilter').onclick = () => { state.focus = null; render(); };
+  $('search').addEventListener('input', (e) => { state.searchTerm = e.target.value.trim(); render(); });
+
+  /* ===================== GROUPING ===================== */
+  $('btnGroup').onclick = () => {
+    state.grouped = !state.grouped;
+    $('btnGroup').classList.toggle('active', state.grouped);
+    if(!state.grouped){
+      state.beats.forEach(b => {
+        b.x = b.freeX !== undefined ? b.freeX : b.x;
+        b.y = b.freeY !== undefined ? b.freeY : b.y;
+      });
+    } else {
+      state.beats.forEach(b => { b.freeX = b.x; b.freeY = b.y; });
+    }
+    render();
+  };
+
+  /* ===================== SIDEBAR ===================== */
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+  });
+  function switchTab(name){
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab===name));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id==='tab-'+name));
+  }
+
+  function renderSidebar(){
+    // Guide
+    const guideList = $('guideList');
+    if(!guideList.dataset.built){
+      guideList.innerHTML = HERO_STEPS.map(s => `
+        <div class="step-card">
+          <div class="step-head">
+            <span class="step-num" style="background:${actColor(s.act)}">${s.id}</span>
+            <span class="step-title">${escapeHtml(s.title)}</span>
+          </div>
+          <p class="step-desc">${escapeHtml(s.desc)}</p>
+          <button class="step-add" data-step="${s.id}">＋ Añadir al tablero</button>
+        </div>
+      `).join('');
+      guideList.dataset.built = '1';
+      guideList.querySelectorAll('.step-add').forEach(btn => {
+        btn.onclick = () => addBeatFromStep(parseInt(btn.dataset.step,10));
+      });
+      // populate hero step select in modal once
+      const sel = $('fHeroStep');
+      HERO_STEPS.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id; opt.textContent = `${s.id}. ${s.title}`;
+        sel.appendChild(opt);
+      });
+    }
+
+    // Antagonism tips (build once)
+    const antagonismList = $('antagonismList');
+    if(!antagonismList.dataset.built){
+      antagonismList.innerHTML = ANTAGONISM_TIPS.map(t => `
+        <div class="step-card">
+          <div class="step-head">
+            <span class="step-num" style="background:${t.color}">⚔</span>
+            <span class="step-title">${escapeHtml(t.title)}</span>
+          </div>
+          <p class="step-desc">${escapeHtml(t.desc)}</p>
+          <button class="step-add" data-tip="${t.id}">＋ Crear beat de confrontación</button>
+        </div>
+      `).join('');
+      antagonismList.dataset.built = '1';
+      antagonismList.querySelectorAll('.step-add').forEach(btn => {
+        btn.onclick = () => addBeatFromAntagonism(parseInt(btn.dataset.tip,10));
+      });
+      // populate antagonism select in modal once
+      const antSel = $('fAntagonism');
+      ANTAGONISM_TIPS.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.id; opt.textContent = t.title;
+        antSel.appendChild(opt);
+      });
+    }
+
+    renderDevelopmentTab();
+
+    // Characters
+    const charList = $('characterList');
+    charList.innerHTML = '';
+    if(state.characters.length === 0){
+      charList.innerHTML = '<p style="color:var(--text-dim);font-size:12.5px;">Aún no hay personajes. Añade uno abajo.</p>';
+    }
+    state.characters.forEach(c => {
+      const count = state.beats.filter(b => b.characters.includes(c.id)).length;
+      const row = document.createElement('div');
+      row.className = 'entity-row' + (state.focus && state.focus.type==='character' && state.focus.id===c.id ? ' focused' : '');
+      row.innerHTML = `<span class="dot" style="background:${c.color}"></span><span class="name">${escapeHtml(c.name)}</span><span class="count mono">${count}</span><span class="del">✕</span>`;
+      row.onclick = () => setFocus({type:'character', id:c.id, label:c.name, color:c.color});
+      row.querySelector('.del').onclick = (e) => { e.stopPropagation(); removeCharacter(c.id); };
+      charList.appendChild(row);
+    });
+
+    // Locations
+    const locList = $('locationList');
+    locList.innerHTML = '';
+    if(state.locations.length === 0){
+      locList.innerHTML = '<p style="color:var(--text-dim);font-size:12.5px;">Aún no hay localizaciones. Añade una abajo.</p>';
+    }
+    state.locations.forEach(l => {
+      const count = state.beats.filter(b => b.location === l.id).length;
+      const row = document.createElement('div');
+      row.className = 'entity-row' + (state.focus && state.focus.type==='location' && state.focus.id===l.id ? ' focused' : '');
+      row.innerHTML = `<span class="dot" style="background:${l.color}"></span><span class="name">${escapeHtml(l.name)}</span><span class="count mono">${count}</span><span class="del">✕</span>`;
+      row.onclick = () => setFocus({type:'location', id:l.id, label:l.name, color:l.color});
+      row.querySelector('.del').onclick = (e) => { e.stopPropagation(); removeLocation(l.id); };
+      locList.appendChild(row);
+    });
+
+    // Props cloud
+    const propSet = new Map();
+    state.beats.forEach(b => (b.props||[]).forEach(p => propSet.set(p.toLowerCase(), (propSet.get(p.toLowerCase())||0)+1)));
+    const cloud = $('propCloud');
+    cloud.innerHTML = '';
+    if(propSet.size === 0){
+      cloud.innerHTML = '<p style="color:var(--text-dim);font-size:12.5px;">Los props que añadas a tus beats aparecerán aquí.</p>';
+    }
+    Array.from(propSet.entries()).forEach(([p,count]) => {
+      const chip = document.createElement('span');
+      chip.className = 'chip prop';
+      chip.style.borderColor = (state.focus && state.focus.type==='prop' && state.focus.id===p) ? 'rgba(var(--teal-rgb),0.6)' : '';
+      chip.textContent = `#${p} · ${count}`;
+      chip.onclick = () => setFocus({type:'prop', id:p, label:p, color:'#93959c'});
+      cloud.appendChild(chip);
+    });
+  }
+
+  function renderDevelopmentTab(){
+    const wrap = $('developmentList');
+    wrap.innerHTML = '';
+    if(state.characters.length === 0){
+      wrap.innerHTML = '<p style="color:var(--text-dim);font-size:12.5px;">Añade personajes en la pestaña "Personajes" para empezar a construirlos aquí.</p>';
+      return;
+    }
+    state.characters.forEach(c => {
+      const filled = DEV_FIELDS.filter(f => (c[f.key]||'').trim()).length;
+      const card = document.createElement('div');
+      card.className = 'dev-card' + (expandedDev.has(c.id) ? ' open' : '');
+      card.innerHTML = `
+        <div class="dev-head">
+          <span class="dot" style="background:${c.color}"></span>
+          <span class="dev-name">${escapeHtml(c.name)}</span>
+          <span class="dev-progress mono" id="devprog-${c.id}">${filled}/${DEV_FIELDS.length}</span>
+          <span class="dev-chevron">⌄</span>
+        </div>
+        <div class="dev-body">
+          ${DEV_FIELDS.map(f => `
+            <div class="dev-field">
+              <label>${f.label}</label>
+              <textarea rows="2" placeholder="${f.ph}">${escapeHtml(c[f.key]||'')}</textarea>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      card.querySelector('.dev-head').onclick = () => {
+        card.classList.toggle('open');
+        if(card.classList.contains('open')) expandedDev.add(c.id); else expandedDev.delete(c.id);
+      };
+      const textareas = card.querySelectorAll('.dev-field textarea');
+      textareas.forEach((ta, i) => {
+        ta.addEventListener('input', () => {
+          const char = findChar(c.id);
+          if(!char) return;
+          char[DEV_FIELDS[i].key] = ta.value;
+          const badge = document.getElementById('devprog-'+c.id);
+          if(badge){
+            const cnt = DEV_FIELDS.filter(f => (char[f.key]||'').trim()).length;
+            badge.textContent = cnt + '/' + DEV_FIELDS.length;
+          }
+        });
+      });
+      wrap.appendChild(card);
+    });
+  }
+
+  function addBeatFromAntagonism(tipId){
+    const tip = ANTAGONISM_TIPS.find(t => t.id === tipId);
+    const beat = makeBeat({ title: tip.title, desc: tip.desc, antagonism: tip.id });
+    state.beats.push(beat);
+    showToast('Beat de antagonismo añadido', () => {
+      state.beats = state.beats.filter(b=>b.id!==beat.id); render();
+    });
+    render();
+  }
+
+  function removeCharacter(id){
+    state.characters = state.characters.filter(c=>c.id!==id);
+    state.beats.forEach(b => { b.characters = b.characters.filter(cid=>cid!==id); });
+    if(state.focus && state.focus.type==='character' && state.focus.id===id) state.focus = null;
+    render();
+  }
+  function removeLocation(id){
+    state.locations = state.locations.filter(l=>l.id!==id);
+    state.beats.forEach(b => { if(b.location===id) b.location = null; });
+    if(state.focus && state.focus.type==='location' && state.focus.id===id) state.focus = null;
+    render();
+  }
+
+  $('btnAddCharacter').onclick = () => {
+    const input = $('newCharacterInput');
+    const name = input.value.trim();
+    if(!name) return;
+    state.characters.push({id: uid('ch'), name, color: nextPaletteColor(state.characters.length), want:'', need:'', wound:'', fear:'', flaw:'', arc:''});
+    input.value = '';
+    render();
+  };
+  $('newCharacterInput').addEventListener('keydown', e => { if(e.key==='Enter') $('btnAddCharacter').click(); });
+
+  $('btnAddLocation').onclick = () => {
+    const input = $('newLocationInput');
+    const name = input.value.trim();
+    if(!name) return;
+    state.locations.push({id: uid('lo'), name, color: nextPaletteColor(state.locations.length)});
+    input.value = '';
+    render();
+  };
+  $('newLocationInput').addEventListener('keydown', e => { if(e.key==='Enter') $('btnAddLocation').click(); });
+
+  $('btnToggleSidebar').onclick = () => $('sidebar').classList.toggle('collapsed');
+
+  /* ===================== GUIDE PANEL (uses sidebar guide tab) ===================== */
+  $('btnGuide').onclick = () => { $('sidebar').classList.remove('collapsed'); switchTab('guide'); };
+  $('btnEmptyGuide').onclick = () => $('btnGuide').click();
+
+  function addBeatFromStep(stepId){
+    const step = HERO_STEPS.find(s=>s.id===stepId);
+    const beat = makeBeat({ title: step.title, desc: step.desc, act: step.act, heroStep: step.id });
+    state.beats.push(beat);
+    showToast('Beat añadido desde la guía', () => {
+      state.beats = state.beats.filter(b=>b.id!==beat.id); render();
+    });
+    render();
+  }
+
+  /* ===================== BEATS: CRUD ===================== */
+  function makeBeat(partial){
+    const count = state.beats.length;
+    const cascadeX = 90 + (count % 4) * 60;
+    const cascadeY = 90 + Math.floor(count/4) * 50;
+    return Object.assign({
+      id: uid('beat'),
+      title: '', desc: '', act: null, heroStep: null, antagonism: null,
+      characters: [], location: null, props: [], targetPages: null, script: null,
+      x: cascadeX + Math.random()*40, y: cascadeY + Math.random()*40,
+    }, partial);
+  }
+
+  function deleteBeat(id){
+    const beat = state.beats.find(b=>b.id===id);
+    if(!beat) return;
+    const beatIndex = state.beats.findIndex(b=>b.id===id);
+    const relatedConns = state.connections.filter(c => c.from===id || c.to===id);
+    state.beats.splice(beatIndex,1);
+    state.connections = state.connections.filter(c => c.from!==id && c.to!==id);
+    showToast('Beat eliminado', () => {
+      state.beats.splice(beatIndex,0,beat);
+      state.connections = state.connections.concat(relatedConns);
+      render();
+    });
+    render();
+  }
+
+  /* ===================== MODAL ===================== */
+  function buildActPicker(){
+    const wrap = $('actPicker');
+    wrap.innerHTML = '';
+    const opts = [{id:null, name:'Sin asignar', color:NO_ACT_COLOR}, ...ACTS];
+    opts.forEach(a => {
+      const el = document.createElement('div');
+      el.className = 'act-opt';
+      el.textContent = a.name;
+      el.style.color = a.color;
+      el.dataset.act = a.id===null ? '' : a.id;
+      el.onclick = () => {
+        wrap.querySelectorAll('.act-opt').forEach(o=>o.classList.remove('on'));
+        el.classList.add('on');
+      };
+      wrap.appendChild(el);
+    });
+  }
+  buildActPicker();
+
+  function openBeatModal(beatId){
+    state.editingBeatId = beatId || null;
+    const beat = beatId ? state.beats.find(b=>b.id===beatId) : null;
+    $('modalTitle').textContent = beat ? 'Editar beat' : 'Nuevo beat';
+    $('btnDeleteBeat').style.display = beat ? 'inline-flex' : 'none';
+    $('fTitle').value = beat ? beat.title : '';
+    $('fDesc').value = beat ? beat.desc : '';
+    $('fProps').value = beat ? (beat.props||[]).join(', ') : '';
+    $('fHeroStep').value = beat && beat.heroStep ? beat.heroStep : '';
+    $('fAntagonism').value = beat && beat.antagonism ? beat.antagonism : '';
+    $('fTargetPages').value = (beat && beat.targetPages != null) ? beat.targetPages : '';
+
+    // act picker
+    const actVal = beat ? (beat.act||'') : '';
+    $('actPicker').querySelectorAll('.act-opt').forEach(o => o.classList.toggle('on', o.dataset.act === actVal));
+
+    // character picker
+    modalTemp.characters = new Set(beat ? beat.characters : []);
+    modalTemp.location = beat ? beat.location : null;
+    renderCharacterPicker();
+    renderLocationPicker();
+
+    $('modalOverlay').classList.add('show');
+  }
+  function closeModal(){ $('modalOverlay').classList.remove('show'); state.editingBeatId = null; }
+
+  function renderCharacterPicker(){
+    const wrap = $('characterPicker');
+    wrap.innerHTML = '';
+    if(state.characters.length === 0){
+      wrap.innerHTML = '<span style="color:var(--text-dim);font-size:12px;">Añade personajes desde la pestaña "Personajes" del panel lateral.</span>';
+      return;
+    }
+    state.characters.forEach(c => {
+      const chip = document.createElement('span');
+      chip.className = 'chip-toggle' + (modalTemp.characters.has(c.id) ? ' on' : '');
+      chip.innerHTML = `<span class="dot" style="background:${c.color}"></span>${escapeHtml(c.name)}`;
+      chip.onclick = () => {
+        if(modalTemp.characters.has(c.id)) modalTemp.characters.delete(c.id);
+        else modalTemp.characters.add(c.id);
+        renderCharacterPicker();
+      };
+      wrap.appendChild(chip);
+    });
+  }
+  function renderLocationPicker(){
+    const wrap = $('locationPicker');
+    wrap.innerHTML = '';
+    if(state.locations.length === 0){
+      wrap.innerHTML = '<span style="color:var(--text-dim);font-size:12px;">Añade localizaciones desde la pestaña "Localizaciones" del panel lateral.</span>';
+      return;
+    }
+    state.locations.forEach(l => {
+      const chip = document.createElement('span');
+      chip.className = 'chip-toggle' + (modalTemp.location===l.id ? ' on' : '');
+      chip.innerHTML = `<span class="dot" style="background:${l.color}"></span>${escapeHtml(l.name)}`;
+      chip.onclick = () => {
+        modalTemp.location = (modalTemp.location === l.id) ? null : l.id;
+        renderLocationPicker();
+      };
+      wrap.appendChild(chip);
+    });
+  }
+
+  $('btnSaveBeat').onclick = () => {
+    const title = $('fTitle').value.trim() || 'Beat sin título';
+    const desc = $('fDesc').value.trim();
+    const actEl = $('actPicker').querySelector('.act-opt.on');
+    const act = actEl && actEl.dataset.act ? actEl.dataset.act : null;
+    const heroStep = $('fHeroStep').value ? parseInt($('fHeroStep').value,10) : null;
+    const antagonism = $('fAntagonism').value ? parseInt($('fAntagonism').value,10) : null;
+    const targetPagesRaw = $('fTargetPages').value.replace(',', '.').trim();
+    const targetPages = targetPagesRaw ? parseFloat(targetPagesRaw) : null;
+    const props = $('fProps').value.split(',').map(s=>s.trim()).filter(Boolean);
+    const characters = Array.from(modalTemp.characters);
+    const location = modalTemp.location;
+
+    if(state.editingBeatId){
+      const beat = state.beats.find(b=>b.id===state.editingBeatId);
+      Object.assign(beat, {title, desc, act, heroStep, antagonism, props, characters, location, targetPages});
+    } else {
+      state.beats.push(makeBeat({title, desc, act, heroStep, antagonism, props, characters, location, targetPages}));
+    }
+    closeModal();
+    render();
+  };
+  $('btnCancelModal').onclick = closeModal;
+  $('modalOverlay').addEventListener('mousedown', (e) => { if(e.target === $('modalOverlay')) closeModal(); });
+  $('btnDeleteBeat').onclick = () => {
+    const id = state.editingBeatId;
+    closeModal();
+    deleteBeat(id);
+  };
+
+  $('btnNew').onclick = () => openBeatModal(null);
+  $('btnEmptyNew').onclick = () => openBeatModal(null);
+
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape'){
+      if($('scriptModalOverlay').classList.contains('show')) closeScriptModal();
+      else if($('moodModalOverlay').classList.contains('show')) closeMoodModal();
+      else if($('modalOverlay').classList.contains('show')) closeModal();
+      else if(state.connectMode) toggleConnectMode(false);
+    }
+  });
+
+  /* ===================== SCRIPT EDITOR (compartido: tarjeta + documento) ===================== */
+  let focusedBlockBeatId = null;
+  let docCombinedBlocks = [];
+
+  function getCurrentScriptBeat(){ return state.beats.find(b => b.id === currentScriptBeatId); }
+
+  function wrapLines(text, width){
+    const segs = (text||'').split('\n');
+    let total = 0;
+    segs.forEach(seg => {
+      if(width > 999) total += 1;
+      else total += seg.length === 0 ? 1 : Math.ceil(seg.length / width);
+    });
+    return total;
+  }
+
+  function computeScriptStats(blocks){
+    const res = layoutBlocks((blocks||[]).map(b => ({type: b.type, text: b.text})));
+    const lines = (res.pages - 1) * LINES_PER_PAGE + res.lastLine;
+    return { lines, pages: (blocks && blocks.length) ? (res.pages - 1) + res.lastLine / LINES_PER_PAGE : 0 };
+  }
+
+  function autoSlugline(beat){
+    if(!beat.location) return '';
+    const l = findLoc(beat.location);
+    return l ? ('INT. ' + l.name.toUpperCase() + ' — DÍA') : '';
+  }
+
+  function ensureBeatScript(beat){
+    if(!beat.script || !beat.script.length){
+      beat.script = [
+        {type:'heading', text: autoSlugline(beat)},
+        {type:'action', text: beat.desc || ''},
+      ];
+    }
+    return beat.script;
+  }
+
+  /* (CONT'D): el mismo personaje vuelve a hablar sin que hable otro ni cambie la escena (p. ej. tras una acción) */
+  function computeContdFlags(blocks){
+    const flags = []; let last = null;
+    blocks.forEach((b, i) => {
+      flags[i] = false;
+      if(b.type === 'heading'){ last = null; return; }
+      if(b.type !== 'character') return;
+      const raw = String(b.text || '');
+      const key = raw.toUpperCase().replace(/\s*\(CONT['’]?D\.?\)\s*/g, ' ').replace(/\s+/g, ' ').trim();
+      if(!key) return;
+      if(last !== null && key === last && !/CONT['’]?D/i.test(raw)) flags[i] = true;
+      last = key;
+    });
+    return flags;
+  }
+  function sceneNumberStart(beat){
+    let n = 0;
+    for(const b of computeNarrativeOrder()){
+      if(beat && b.id === beat.id) break;
+      (b.script || []).forEach(x => { if(x.type === 'heading' && (x.text || '').trim()) n++; });
+    }
+    return n;
+  }
+  function updateSceneNumbers(pageEl){
+    if(!pageEl) return;
+    const els = pageItemsOf(pageEl);
+    let n = (state.sceneNumbers && pageEl === $('scriptPage')) ? sceneNumberStart(getCurrentScriptBeat()) : 0;
+    els.forEach(el => {
+      if(state.sceneNumbers && el.classList.contains('sp-heading') && el.textContent.trim()) el.dataset.scene = String(++n);
+      else if(el.dataset.scene) delete el.dataset.scene;
+    });
+  }
+  function updateContdClasses(pageEl){
+    if(!pageEl) return;
+    const els = pageItemsOf(pageEl);
+    const blocks = els.map(el => ({type: elLayoutType(el), text: el.classList.contains('doc-beat-divider') ? '' : el.textContent}));
+    const cf = state.autoContd !== false ? computeContdFlags(blocks) : [];
+    els.forEach((el, k) => el.classList.toggle('contd', !!cf[k]));
+    updateSceneNumbers(pageEl);
+  }
+  function pageItemsOf(pageEl){
+    return Array.from(pageEl.children).filter(el => el.classList.contains('sp-block') || el.classList.contains('doc-beat-divider'));
+  }
+  function elLayoutType(el){
+    if(el.classList.contains('doc-beat-divider')) return 'divider';
+    const m = el.className.match(/sp-(heading|action|note|character|parenthetical|dialogue|transition)/);
+    return m ? m[1] : 'action';
+  }
+  const PAGE_PX = {lh:16, bottom:114, gap:28, top:96};
+  function insertPageBreakMarkersFor(_ignored, pageEl){
+    pageEl.querySelectorAll('.page-break-marker').forEach(m => m.remove());
+    const els = pageItemsOf(pageEl);
+    if(!els.length) return;
+    const blocks = els.map(el => ({type: elLayoutType(el), text: el.classList.contains('doc-beat-divider') ? (el.dataset.label || '') : el.textContent}));
+    updateContdClasses(pageEl);
+    const res = layoutBlocks(blocks);
+    res.items.forEach((it, k) => {
+      if(!it.breakBefore || !els[k]) return;
+      const m = document.createElement('div');
+      m.className = 'page-break-marker';
+      m.contentEditable = 'false';
+      const fill = it.fillLines * PAGE_PX.lh + PAGE_PX.bottom;
+      m.innerHTML = `<div class="pb-fill" style="height:${fill}px"></div><div class="pb-gap"></div><div class="pb-top"><span>${it.page + 1}.</span></div>`;
+      els[k].parentNode.insertBefore(m, els[k]);
+    });
+  }
+
+  function placeCaretAtEnd(el){
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+  function placeCaretAtStart(el){
+    const range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(true);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
+  function rerenderContainer(container){
+    if(container === $('scriptPage')) renderScriptPage();
+    else renderFullDocument();
+  }
+
+  function onBlocksChanged(container){
+    // Las estadísticas son baratas y no tocan el DOM de los bloques: se
+    // actualizan al instante. Los marcadores de "Pág. N" YA NO se tocan
+    // aquí en absoluto — insertar/quitar esos elementos junto al cursor
+    // mientras escribes (aunque fuera con retraso) seguía siendo capaz
+    // de descolocar el texto al escribir de corrido. Ahora los
+    // marcadores solo se recalculan en cambios estructurales (que ya
+    // reconstruyen la página entera de todas formas) y al salir del
+    // área de edición — nunca mientras el cursor sigue activo dentro.
+    updateContdClasses(container);
+    if(container === $('scriptPage')) updateScriptStats();
+    else updateDocStats();
+  }
+
+  function refreshPageMarkersNow(container){
+    if(container === $('scriptPage')) insertPageBreakMarkers();
+    else insertPageBreakMarkersFor(getDocCombinedBlocksFresh(), $('docPage'));
+  }
+
+  function toolbarFor(container){ return container === $('scriptPage') ? $('scriptToolbar') : $('docToolbar'); }
+
+  function updateActiveToolbarFor(container){
+    const bar = toolbarFor(container);
+    const beat = state.beats.find(b => b.id === focusedBlockBeatId);
+    if(!beat || !bar) return;
+    const t = beat.script[focusedBlockIndex] ? beat.script[focusedBlockIndex].type : null;
+    bar.querySelectorAll('button[data-type]').forEach(b => b.classList.toggle('on', b.dataset.type === t));
+  }
+
+  function focusBlockIn(container, beatId, idx, atEnd){
+    const el = container.querySelector(`.sp-block[data-beat-id="${beatId}"][data-idx="${idx}"]`);
+    if(!el) return;
+    container.focus();
+    if(atEnd) placeCaretAtEnd(el); else placeCaretAtStart(el);
+    updateFocusedFromSelection(container);
+  }
+  function focusBlockAtOffset(container, beatId, idx, offset){
+    const el = container.querySelector(`.sp-block[data-beat-id="${beatId}"][data-idx="${idx}"]`);
+    if(!el) return;
+    container.focus();
+    const range = document.createRange();
+    const textNode = el.firstChild;
+    if(textNode && textNode.nodeType === Node.TEXT_NODE){
+      range.setStart(textNode, Math.min(offset, textNode.textContent.length));
+    } else {
+      range.selectNodeContents(el);
+    }
+    range.collapse(true);
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    updateFocusedFromSelection(container);
+  }
+
+  function insertSoftBreakAtCaret(div, block, container){
+    const sel = window.getSelection();
+    if(!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+    range.deleteContents();
+    const node = document.createTextNode('\n');
+    range.insertNode(node);
+    range.setStartAfter(node); range.setEndAfter(node);
+    sel.removeAllRanges(); sel.addRange(range);
+    block.text = div.textContent;
+    onBlocksChanged(container);
+  }
+
+  function cycleBlockType(beat, idx, container, dir){
+    const cur = TYPE_ORDER.indexOf(beat.script[idx].type);
+    beat.script[idx].type = TYPE_ORDER[(cur + dir + TYPE_ORDER.length) % TYPE_ORDER.length];
+    focusedBlockIndex = idx; focusedBlockBeatId = beat.id;
+    rerenderContainer(container);
+    focusBlockIn(container, beat.id, idx, true);
+    onBlocksChanged(container);
+  }
+  function setBlockTypeDirect(beat, idx, type, container){
+    if(!beat || idx == null) return;
+    beat.script[idx].type = type;
+    focusedBlockIndex = idx; focusedBlockBeatId = beat.id;
+    rerenderContainer(container);
+    focusBlockIn(container, beat.id, idx, true);
+    onBlocksChanged(container);
+    if(type === 'character') openCharDropdownFor(beat, idx, container);
+  }
+
+  /* ---- desplegable de autocompletado de personajes (Tab -> Personaje) ---- */
+  let charDropdown = { open:false, container:null, beatId:null, idx:null, items:[], highlighted:0 };
+
+  function openCharDropdownFor(beat, idx, container){
+    if(!state.characters || state.characters.length === 0){ closeCharDropdown(); return; }
+    const el = container.querySelector(`.sp-block[data-beat-id="${beat.id}"][data-idx="${idx}"]`);
+    if(!el) return;
+    const filterText = (el.textContent || '').trim().toLowerCase();
+    const items = state.characters.filter(c => !filterText || c.name.toLowerCase().includes(filterText));
+    if(items.length === 0){ closeCharDropdown(); return; }
+    charDropdown = { open:true, container, beatId:beat.id, idx, items, highlighted:0 };
+    renderCharDropdown(el);
+  }
+  function renderCharDropdown(anchorEl){
+    const dd = $('charAutocomplete');
+    const rect = anchorEl.getBoundingClientRect();
+    dd.style.left = rect.left + 'px';
+    dd.style.top = (rect.bottom + 4) + 'px';
+    dd.innerHTML = charDropdown.items.map((c,i) => `
+      <div class="char-ac-item ${i===charDropdown.highlighted?'hl':''}" data-i="${i}">
+        <span class="dot" style="background:${c.color}"></span>${escapeHtml(c.name)}
+      </div>`).join('');
+    dd.classList.add('show');
+    dd.querySelectorAll('.char-ac-item').forEach(item => {
+      item.onmousedown = (e) => { e.preventDefault(); charDropdown.highlighted = parseInt(item.dataset.i,10); confirmCharDropdown(); };
+    });
+  }
+  function moveCharDropdown(dir){
+    const n = charDropdown.items.length;
+    charDropdown.highlighted = (charDropdown.highlighted + dir + n) % n;
+    const anchorEl = charDropdown.container.querySelector(`.sp-block[data-beat-id="${charDropdown.beatId}"][data-idx="${charDropdown.idx}"]`);
+    if(anchorEl) renderCharDropdown(anchorEl);
+  }
+  function confirmCharDropdown(){
+    const { container, beatId, idx, items, highlighted } = charDropdown;
+    const chosen = items[highlighted];
+    closeCharDropdown();
+    const beat = state.beats.find(b => b.id === beatId);
+    if(!chosen || !beat || !beat.script[idx]) return;
+    snapshotForUndo(beat);
+    beat.script[idx].text = chosen.name;
+    const nextIdx = idx + 1;
+    beat.script.splice(nextIdx, 0, {type:'dialogue', text:''});
+    rerenderContainer(container);
+    focusBlockIn(container, beatId, nextIdx);
+    onBlocksChanged(container);
+  }
+  function closeCharDropdown(){
+    charDropdown = { open:false, container:null, beatId:null, idx:null, items:[], highlighted:0 };
+    const dd = $('charAutocomplete');
+    if(dd) dd.classList.remove('show');
+  }
+  function maybeFilterCharDropdown(container){
+    if(!charDropdown.open || charDropdown.container !== container) return;
+    const el = container.querySelector(`.sp-block[data-beat-id="${charDropdown.beatId}"][data-idx="${charDropdown.idx}"]`);
+    if(!el){ closeCharDropdown(); return; }
+    const filterText = (el.textContent || '').trim().toLowerCase();
+    const items = state.characters.filter(c => !filterText || c.name.toLowerCase().includes(filterText));
+    if(items.length === 0){ closeCharDropdown(); return; }
+    charDropdown.items = items;
+    charDropdown.highlighted = 0;
+    renderCharDropdown(el);
+  }
+  document.addEventListener('mousedown', (e) => {
+    if(charDropdown.open && !e.target.closest('.char-autocomplete') && !e.target.closest('.sp-character')){
+      closeCharDropdown();
+    }
+  });
+
+  /* ---- localizar el bloque actual a partir de la selección del navegador ---- */
+  function getCurrentBlockEl(container){
+    const sel = window.getSelection();
+    if(!sel || !sel.anchorNode) return null;
+    let node = sel.anchorNode;
+    if(node.nodeType === Node.TEXT_NODE) node = node.parentElement;
+    if(!node || !container.contains(node)) return null;
+    return node.closest ? node.closest('.sp-block') : null;
+  }
+  function caretIsAtBlockStart(el){
+    const sel = window.getSelection();
+    if(!sel.rangeCount) return false;
+    const range = sel.getRangeAt(0);
+    if(!range.collapsed) return false;
+    const pre = range.cloneRange();
+    pre.selectNodeContents(el);
+    pre.setEnd(range.startContainer, range.startOffset);
+    return pre.toString().length === 0;
+  }
+  function caretIsAtBlockEnd(el){
+    const sel = window.getSelection();
+    if(!sel.rangeCount) return false;
+    const range = sel.getRangeAt(0);
+    if(!range.collapsed) return false;
+    const post = range.cloneRange();
+    post.selectNodeContents(el);
+    post.setStart(range.endContainer, range.endOffset);
+    return post.toString().length === 0;
+  }
+  function updateFocusedFromSelection(container){
+    const el = getCurrentBlockEl(container);
+    if(!el) return;
+    focusedBlockIndex = parseInt(el.dataset.idx, 10);
+    focusedBlockBeatId = el.dataset.beatId;
+    container.querySelectorAll('.sp-block').forEach(x => x.classList.remove('focused'));
+    el.classList.add('focused');
+    updateActiveToolbarFor(container);
+  }
+
+  /* ---- re-derivar beat.script desde el DOM tras cualquier edición nativa ----
+     Como toda la página es un único contenteditable (necesario para que la
+     selección funcione a través de varias líneas), el navegador puede a
+     veces fusionar/eliminar divs por su cuenta al escribir sobre una
+     selección que abarca varios bloques. En vez de intentar adivinar qué
+     cambió, reconstruimos el array de bloques leyendo el DOM tal cual haya
+     quedado — así nunca queda desincronizado. */
+  /* ---- deshacer / rehacer (Ctrl+Z / Ctrl+Y) ---- */
+  const UNDO_LIMIT = 60;
+  let undoStack = []; // {beatId, script}
+  let redoStack = [];
+  let lastSnapshotAt = 0;
+
+  function cloneScript(script){ return (script || []).map(b => ({type: b.type, text: b.text})); }
+  function snapshotForUndo(beat){
+    if(!beat) return;
+    undoStack.push({ beatId: beat.id, script: cloneScript(beat.script) });
+    if(undoStack.length > UNDO_LIMIT) undoStack.shift();
+    redoStack = [];
+  }
+  function maybeSnapshotForTyping(beat){
+    const now = Date.now();
+    if(now - lastSnapshotAt > 1200){
+      snapshotForUndo(beat);
+      lastSnapshotAt = now;
+    }
+  }
+  function performUndo(container){
+    if(undoStack.length === 0) return;
+    const snap = undoStack.pop();
+    const beat = state.beats.find(b => b.id === snap.beatId);
+    if(!beat) return;
+    redoStack.push({ beatId: beat.id, script: cloneScript(beat.script) });
+    beat.script = snap.script;
+    rerenderContainer(container);
+    onBlocksChanged(container);
+  }
+  function performRedo(container){
+    if(redoStack.length === 0) return;
+    const snap = redoStack.pop();
+    const beat = state.beats.find(b => b.id === snap.beatId);
+    if(!beat) return;
+    undoStack.push({ beatId: beat.id, script: cloneScript(beat.script) });
+    beat.script = snap.script;
+    rerenderContainer(container);
+    onBlocksChanged(container);
+  }
+  document.addEventListener('keydown', (e) => {
+    const page = e.target.closest && e.target.closest('.script-page');
+    if(!page) return;
+    const isZ = e.key.toLowerCase() === 'z';
+    const isY = e.key.toLowerCase() === 'y';
+    if((e.ctrlKey || e.metaKey) && isZ && !e.shiftKey){ e.preventDefault(); performUndo(page); return; }
+    if((e.ctrlKey || e.metaKey) && ((isZ && e.shiftKey) || isY)){ e.preventDefault(); performRedo(page); return; }
+  }, true);
+
+  function resyncBlocksFromDOM(container){
+    const groups = {};
+    Array.from(container.querySelectorAll('.sp-block')).forEach(el => {
+      const bid = el.dataset.beatId;
+      groups[bid] = groups[bid] || [];
+      const m = el.className.match(/sp-(heading|action|note|character|parenthetical|dialogue|transition)/);
+      const newIdx = groups[bid].length;
+      if(el.dataset.idx !== String(newIdx)) el.dataset.idx = newIdx; // no tocar el DOM si no hace falta
+      groups[bid].push({type: m ? m[1] : 'action', text: el.textContent});
+    });
+    Object.keys(groups).forEach(bid => {
+      const beat = state.beats.find(b => b.id === bid);
+      if(beat && groups[bid].length) beat.script = groups[bid];
+    });
+  }
+
+  function handleContainerKeydown(e, container){
+    const el = getCurrentBlockEl(container);
+    if(!el) return;
+    const beat = state.beats.find(b => b.id === el.dataset.beatId);
+    if(!beat) return;
+    const idx = parseInt(el.dataset.idx, 10);
+    const block = beat.script[idx];
+    if(!block) return;
+
+    if(charDropdown.open){
+      if(e.key === 'ArrowDown'){ e.preventDefault(); moveCharDropdown(1); return; }
+      if(e.key === 'ArrowUp'){ e.preventDefault(); moveCharDropdown(-1); return; }
+      if(e.key === 'Enter' || e.key === 'Tab'){ e.preventDefault(); confirmCharDropdown(); return; }
+      if(e.key === 'Escape'){ e.preventDefault(); closeCharDropdown(); return; }
+    }
+
+    if(e.key === 'Tab' && !e.shiftKey){
+      e.preventDefault();
+      snapshotForUndo(beat);
+      setBlockTypeDirect(beat, idx, 'character', container);
+      return;
+    }
+    if(e.key === 'Tab' && e.shiftKey){
+      e.preventDefault();
+      snapshotForUndo(beat);
+      cycleBlockType(beat, idx, container, -1);
+      return;
+    }
+    if(e.key === 'Enter' && e.shiftKey){
+      e.preventDefault();
+      insertSoftBreakAtCaret(el, block, container);
+      return;
+    }
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      snapshotForUndo(beat);
+      const nextType = nextTypeOnEnter(block.type, block.text);
+      beat.script.splice(idx + 1, 0, {type: nextType, text: ''});
+      rerenderContainer(container);
+      focusBlockIn(container, beat.id, idx + 1);
+      onBlocksChanged(container);
+      if(nextType === 'character') openCharDropdownFor(beat, idx + 1, container);
+      return;
+    }
+    if(e.key === 'Backspace' && el.textContent.length === 0 && beat.script.length > 1){
+      e.preventDefault();
+      snapshotForUndo(beat);
+      beat.script.splice(idx, 1);
+      rerenderContainer(container);
+      focusBlockIn(container, beat.id, Math.max(0, idx - 1), true);
+      onBlocksChanged(container);
+      return;
+    }
+    // Backspace con texto delante del cursor y el cursor al PRINCIPIO del
+    // bloque: por defecto el navegador fusionaría este bloque con el
+    // anterior por su cuenta, pegando el texto sin espacio ni salto de
+    // línea (esto era lo que rompía el guion). Lo hacemos nosotros, con
+    // un salto de línea de por medio, igual que Shift+Enter.
+    if(e.key === 'Backspace' && idx > 0 && caretIsAtBlockStart(el)){
+      e.preventDefault();
+      snapshotForUndo(beat);
+      const prevBlock = beat.script[idx - 1];
+      const joinPoint = (prevBlock.text || '').length;
+      prevBlock.text = (prevBlock.text || '') + '\n' + (block.text || '');
+      beat.script.splice(idx, 1);
+      rerenderContainer(container);
+      focusBlockAtOffset(container, beat.id, idx - 1, joinPoint + 1);
+      onBlocksChanged(container);
+      return;
+    }
+    // Mismo problema pero con Delete (tecla de borrado hacia delante) al
+    // final del bloque: el navegador fusionaría con el SIGUIENTE bloque.
+    if(e.key === 'Delete' && idx < beat.script.length - 1 && caretIsAtBlockEnd(el)){
+      e.preventDefault();
+      snapshotForUndo(beat);
+      const nextBlock = beat.script[idx + 1];
+      const joinPoint = (block.text || '').length;
+      block.text = (block.text || '') + '\n' + (nextBlock.text || '');
+      beat.script.splice(idx + 1, 1);
+      rerenderContainer(container);
+      focusBlockAtOffset(container, beat.id, idx, joinPoint + 1);
+      onBlocksChanged(container);
+    }
+  }
+
+  function handleContainerPaste(e, container){
+    e.preventDefault();
+    const clip = e.clipboardData || window.clipboardData;
+    const text = clip ? clip.getData('text/plain') : '';
+    if(!text) return;
+    const el = getCurrentBlockEl(container);
+    if(!el) return;
+    const beat = state.beats.find(b => b.id === el.dataset.beatId);
+    if(!beat) return;
+    const idx = parseInt(el.dataset.idx, 10);
+    const block = beat.script[idx];
+    if(!block) return;
+
+    const sel = window.getSelection();
+    if(!sel.rangeCount) return;
+    const range = sel.getRangeAt(0);
+
+    // Selección que abarca varios bloques a la vez: en vez de arriesgar
+    // una fusión rara entre bloques, sustituimos el contenido de este
+    // bloque por el texto pegado y avisamos — prioridad es que nunca se
+    // corrompa el texto, aunque el caso sea poco frecuente.
+    if(!el.contains(range.startContainer) || !el.contains(range.endContainer)){
+      snapshotForUndo(beat);
+      block.text = text;
+      rerenderContainer(container);
+      focusBlockAtOffset(container, beat.id, idx, text.length);
+      onBlocksChanged(container);
+      showToast('Pegado sobre una selección de varias líneas: se sustituyó el bloque actual');
+      return;
+    }
+
+    const pre = range.cloneRange(); pre.selectNodeContents(el); pre.setEnd(range.startContainer, range.startOffset);
+    const post = range.cloneRange(); post.selectNodeContents(el); post.setStart(range.endContainer, range.endOffset);
+    const before = pre.toString();
+    const after = post.toString();
+
+    snapshotForUndo(beat);
+    // El texto pegado se inserta como cadena, en el punto exacto del
+    // cursor, dentro del propio modelo de datos — nunca dejamos que el
+    // navegador lo escriba directamente en el DOM (eso era lo que pegaba
+    // el texto sin separador cada vez que pegabas).
+    block.text = before + text + after;
+    const newOffset = (before + text).length;
+    rerenderContainer(container);
+    focusBlockAtOffset(container, beat.id, idx, newOffset);
+    onBlocksChanged(container);
+  }
+
+  function setupBlockContainer(container){
+    container.addEventListener('input', () => {
+      const el = getCurrentBlockEl(container);
+      const beat = el ? state.beats.find(b => b.id === el.dataset.beatId) : null;
+      if(beat) maybeSnapshotForTyping(beat);
+      resyncBlocksFromDOM(container);
+      onBlocksChanged(container);
+      maybeFilterCharDropdown(container);
+    });
+    container.addEventListener('keydown', (e) => handleContainerKeydown(e, container));
+    container.addEventListener('paste', (e) => handleContainerPaste(e, container));
+    container.addEventListener('click', () => updateFocusedFromSelection(container));
+    container.addEventListener('blur', () => refreshPageMarkersNow(container));
+    container.addEventListener('keyup', (e) => {
+      if(['Tab','Enter','Backspace'].includes(e.key)) return;
+      updateFocusedFromSelection(container);
+    });
+  }
+
+  function createBlockDiv(beat, idx){
+    const b = beat.script[idx];
+    const div = document.createElement('div');
+    div.className = 'sp-block sp-' + b.type;
+    div.dataset.beatId = beat.id;
+    div.dataset.idx = idx;
+    div.textContent = b.text || '';
+    div.setAttribute('data-placeholder', BLOCK_PLACEHOLDER[b.type] || '');
+    return div;
+  }
+
+  function buildBlockToolbar(barId, onPick){
+    const bar = $(barId);
+    if(bar.dataset.built) return;
+    bar.innerHTML = BLOCK_TYPES.map(t => `<button type="button" data-type="${t.key}">${t.label}</button>`).join('')
+      + `<span class="hint">Tab → Personaje (con autocompletar) · Shift+Tab cambia el tipo manualmente · Enter avanza · doble Enter en Acción vacía → Escena · Shift+Enter salto de línea</span>`;
+    const hintEl = bar.querySelector('.hint'); if(hintEl) hintEl.title = hintEl.textContent;
+    bar.dataset.built = '1';
+    bar.querySelectorAll('button[data-type]').forEach(btn => { btn.onclick = () => onPick(btn.dataset.type); });
+  }
+  function buildScriptToolbar(){
+    buildBlockToolbar('scriptToolbar', (type) => {
+      const beat = getCurrentScriptBeat();
+      if(beat) setBlockTypeDirect(beat, focusedBlockIndex, type, $('scriptPage'));
+    });
+  }
+  function buildDocToolbar(){
+    buildBlockToolbar('docToolbar', (type) => {
+      const beat = state.beats.find(b => b.id === focusedBlockBeatId);
+      if(beat) setBlockTypeDirect(beat, focusedBlockIndex, type, $('docPage'));
+    });
+  }
+
+  /* ---- editor de una sola tarjeta ---- */
+  function updateScriptStats(){
+    const beat = getCurrentScriptBeat(); if(!beat) return;
+    const { pages } = computeScriptStats(beat.script);
+    const target = beat.targetPages || 0;
+    $('scriptStats').textContent = `${pages.toFixed(1)} pág · ≈ ${pages.toFixed(1)} min` + (target ? ` · objetivo ${target.toFixed(1)} pág` : '');
+  }
+  function insertPageBreakMarkers(){
+    const beat = getCurrentScriptBeat(); if(!beat) return;
+    insertPageBreakMarkersFor(beat.script, $('scriptPage'));
+  }
+  function renderScriptPage(){
+    const beat = getCurrentScriptBeat(); if(!beat) return;
+    const page = $('scriptPage');
+    page.contentEditable = 'true';
+    page.innerHTML = '';
+    beat.script.forEach((b, idx) => page.appendChild(createBlockDiv(beat, idx)));
+    insertPageBreakMarkers();
+    updateActiveToolbarFor(page);
+  }
+  function openScriptModal(beatId){
+    const beat = state.beats.find(b => b.id === beatId);
+    if(!beat) return;
+    currentScriptBeatId = beatId;
+    ensureBeatScript(beat);
+    if(beat.targetPages == null) beat.targetPages = 1;
+    buildScriptToolbar();
+    $('scriptModalTitle').textContent = 'Guion — ' + (beat.title || 'Sin título');
+    $('scriptTargetInput').value = beat.targetPages;
+    focusedBlockIndex = 0; focusedBlockBeatId = beat.id;
+    renderScriptPage();
+    updateScriptStats();
+    $('scriptModalOverlay').classList.add('show');
+    focusBlockIn($('scriptPage'), beat.id, 0, true);
+  }
+  function closeScriptModal(){
+    $('scriptModalOverlay').classList.remove('show');
+    closeCharDropdown();
+    currentScriptBeatId = null;
+    render();
+  }
+  $('btnCloseScript').onclick = closeScriptModal;
+  $('scriptModalOverlay').addEventListener('mousedown', (e) => { if(e.target === $('scriptModalOverlay')) closeScriptModal(); });
+
+  let clearScriptArmed = false;
+  let clearScriptArmTimer = null;
+  $('btnClearScript').onclick = () => {
+    const beat = getCurrentScriptBeat(); if(!beat) return;
+    if(!clearScriptArmed){
+      clearScriptArmed = true;
+      $('btnClearScript').textContent = '⚠️';
+      $('btnClearScript').title = 'Pulsa otra vez para confirmar: borra todo el guion de esta tarjeta';
+      showToast('Pulsa 🗑️ otra vez para vaciar el guion de esta tarjeta (se puede deshacer con Ctrl+Z)');
+      clearTimeout(clearScriptArmTimer);
+      clearScriptArmTimer = setTimeout(() => {
+        clearScriptArmed = false;
+        $('btnClearScript').textContent = '🗑️';
+        $('btnClearScript').title = 'Vaciar el guion de esta tarjeta';
+      }, 4000);
+      return;
+    }
+    clearTimeout(clearScriptArmTimer);
+    clearScriptArmed = false;
+    $('btnClearScript').textContent = '🗑️';
+    $('btnClearScript').title = 'Vaciar el guion de esta tarjeta';
+    snapshotForUndo(beat);
+    beat.script = [
+      {type:'heading', text: autoSlugline(beat)},
+      {type:'action', text: ''},
+    ];
+    renderScriptPage();
+    updateScriptStats();
+    showToast('Guion vaciado (Ctrl+Z para deshacer)');
+  };
+
+  $('scriptTargetInput').addEventListener('input', (e) => {
+    const beat = getCurrentScriptBeat(); if(!beat) return;
+    const raw = e.target.value.replace(',', '.').trim();
+    beat.targetPages = raw ? parseFloat(raw) || 0 : 0;
+    updateScriptStats();
+  });
+
+  /* ===================== DOCUMENTO COMPLETO (pestaña editable, flujo de tarjetas) ===================== */
+  function actIndex(act){
+    if(!act) return ACTS.length;
+    const i = ACTS.findIndex(a => a.id === act);
+    return i === -1 ? ACTS.length : i;
+  }
+  function hasScriptContent(beat){
+    return !!(beat.script && beat.script.some(b => (b.text||'').trim().length > 0));
+  }
+  function computeNarrativeOrder(){
+    const beats = state.beats;
+    const byActPos = (a, b) => (actIndex(a.act) - actIndex(b.act)) || (a.x - b.x);
+    if(state.connections.length === 0){
+      return beats.slice().sort(byActPos);
+    }
+    const byId = new Map(beats.map(b => [b.id, b]));
+    const outEdges = new Map(beats.map(b => [b.id, []]));
+    const inCount = new Map(beats.map(b => [b.id, 0]));
+    state.connections.forEach(c => {
+      if(outEdges.has(c.from) && byId.has(c.to)){
+        outEdges.get(c.from).push(c.to);
+        inCount.set(c.to, (inCount.get(c.to)||0) + 1);
+      }
+    });
+    const roots = beats.filter(b => (inCount.get(b.id)||0) === 0).sort(byActPos);
+    const visited = new Set();
+    const order = [];
+    function visit(id){
+      if(visited.has(id)) return;
+      visited.add(id);
+      order.push(byId.get(id));
+      const outs = (outEdges.get(id)||[]).slice().sort((x,y) => byActPos(byId.get(x), byId.get(y)));
+      outs.forEach(visit);
+    }
+    roots.forEach(r => visit(r.id));
+    beats.filter(b => !visited.has(b.id)).sort(byActPos).forEach(b => { order.push(b); visited.add(b.id); });
+    return order;
+  }
+
+  /* Reconstruye la lista combinada de bloques del Documento a partir del
+     estado actual, siempre al momento. Antes se guardaba en caché
+     (docCombinedBlocks) y solo se refrescaba en una reconstrucción
+     completa — al escribir texto normal (sin Enter/Tab) la caché se
+     quedaba con objetos viejos mientras beat.script pasaba a tener
+     objetos nuevos, y el marcador de "Pág. N" acababa usando datos
+     obsoletos. Esto es lo que rompía el guion al pasar de página 1. */
+  function getDocCombinedBlocksFresh(){
+    const combined = [];
+    computeNarrativeOrder().forEach(beat => {
+      ensureBeatScript(beat);
+      beat.script.forEach(b => combined.push(b));
+    });
+    return combined;
+  }
+
+  let pageGuideLastTotal = 0;
+  function renderPageGuideList(totalPagesCeil){
+    if(totalPagesCeil === pageGuideLastTotal) return;
+    pageGuideLastTotal = totalPagesCeil;
+    const list = $('pageGuideList');
+    list.innerHTML = '';
+    for(let p = 1; p <= totalPagesCeil; p++){
+      const item = document.createElement('div');
+      item.className = 'page-guide-item';
+      item.textContent = p;
+      item.dataset.page = p;
+      item.onclick = () => scrollToPage(p);
+      list.appendChild(item);
+    }
+  }
+  function scrollToPage(pageNum){
+    const wrap = $('docPageWrap');
+    if(pageNum <= 1){ wrap.scrollTop = 0; return; }
+    const m = $('docPage').querySelectorAll('.page-break-marker')[pageNum - 2];
+    if(!m) return;
+    const gap = m.querySelector('.pb-gap') || m;
+    wrap.scrollTop = Math.max(0, gap.getBoundingClientRect().top - wrap.getBoundingClientRect().top + wrap.scrollTop - 12);
+  }
+  function updatePageGuideIndicator(statsArg){
+    const wrap = $('docPageWrap');
+    const stats = statsArg || computeScriptStats(getDocCombinedBlocksFresh());
+    const totalPages = Math.max(0.125, stats.pages);
+    const totalPagesCeil = Math.max(1, Math.ceil(totalPages));
+    renderPageGuideList(totalPagesCeil);
+
+    const wrapTop = wrap.getBoundingClientRect().top;
+    const refY = wrapTop + Math.min(120, wrap.clientHeight * 0.3);
+    const gaps = Array.from($('docPage').querySelectorAll('.page-break-marker .pb-gap'));
+    let currentPage = 1, pageTop = $('docPage').getBoundingClientRect().top;
+    gaps.forEach((g, i) => { const r = g.getBoundingClientRect(); if(r.bottom <= refY){ currentPage = i + 2; pageTop = r.bottom; } });
+    currentPage = Math.min(totalPagesCeil, currentPage);
+    const zoom = parseFloat($('docPage').style.zoom) || 1;
+    const fractionInPage = Math.min(0.9999, Math.max(0, (refY - pageTop) / (PAPER.h * zoom)));
+    const eighth = Math.max(1, Math.min(8, Math.ceil(fractionInPage * 8) || 1));
+
+    $('pageGuideCurrent').textContent = `Pág. ${currentPage} · ${eighth}/8`;
+    $('pageGuideList').querySelectorAll('.page-guide-item').forEach(el => {
+      el.classList.toggle('active', parseInt(el.dataset.page, 10) === currentPage);
+    });
+  }
+  $('docPageWrap').addEventListener('scroll', () => updatePageGuideIndicator());
+
+  function updateDocStats(){
+    const stats = computeScriptStats(getDocCombinedBlocksFresh());
+    const count = state.beats.length;
+    $('docStats').textContent = `${count} beat${count===1?'':'s'} · ${stats.pages.toFixed(1)} pág`; $('docStats').title = `≈ ${stats.pages.toFixed(1)} min de pantalla`;
+    updatePageGuideIndicator(stats);
+  }
+
+  function renderFullDocument(){
+    const order = computeNarrativeOrder();
+    const page = $('docPage');
+    page.contentEditable = 'true';
+    page.innerHTML = '';
+    const combined = [];
+    order.forEach(beat => {
+      ensureBeatScript(beat);
+      if(state.docShowLabels){
+        const divider = document.createElement('div');
+        divider.className = 'doc-beat-divider';
+        divider.contentEditable = 'false';
+        divider.dataset.label = (beat.title || 'Sin título') + (beat.act ? ' · ' + actName(beat.act) : '');
+        divider.innerHTML = `<span>— ${escapeHtml(divider.dataset.label)} —</span>`;
+        page.appendChild(divider);
+      }
+      beat.script.forEach((b, idx) => {
+        page.appendChild(createBlockDiv(beat, idx));
+        combined.push(b);
+      });
+    });
+    docCombinedBlocks = combined;
+    insertPageBreakMarkersFor(docCombinedBlocks, page);
+    updateActiveToolbarFor(page);
+    updateDocStats();
+    if(order.length === 0){
+      page.innerHTML = '<div class="doc-empty-hint">Crea tu primer beat en la pestaña Beats para empezar a escribir aquí.</div>';
+    }
+  }
+
+  function beatScriptText(beat){
+    if(!beat || !beat.script) return '';
+    return beat.script.map(b => {
+      const t = (b.text||'').trim(); if(!t) return '';
+      if(b.type === 'heading') return t.toUpperCase();
+      if(b.type === 'character') return '  ' + t.toUpperCase();
+      if(b.type === 'parenthetical') return '    (' + t.replace(/^\(|\)$/g,'') + ')';
+      if(b.type === 'dialogue') return '  ' + t;
+      if(b.type === 'transition') return t.toUpperCase();
+      return t;
+    }).filter(Boolean).join('\n');
+  }
+
+  function generateDocText(){
+    const order = computeNarrativeOrder().filter(hasScriptContent);
+    const lines = [];
+    order.forEach(beat => {
+      lines.push('');
+      lines.push(`# ${(beat.title||'Sin título').toUpperCase()}${beat.act ? ' — ' + actName(beat.act) : ''}`);
+      lines.push('');
+      beat.script.forEach(b => {
+        const segs = (b.text||'').split('\n');
+        if(b.type === 'heading'){ segs.forEach(t => lines.push(t.toUpperCase())); lines.push(''); }
+        else if(b.type === 'action' || b.type === 'note'){ segs.forEach(t => lines.push(t)); lines.push(''); }
+        else if(b.type === 'character'){ segs.forEach(t => lines.push(' '.repeat(22) + t.toUpperCase())); }
+        else if(b.type === 'parenthetical'){ segs.forEach(t => lines.push(' '.repeat(16) + '(' + t.replace(/^\(|\)$/g,'') + ')')); }
+        else if(b.type === 'dialogue'){ segs.forEach(t => lines.push(' '.repeat(10) + t)); lines.push(''); }
+        else if(b.type === 'transition'){ segs.forEach(t => lines.push(' '.repeat(60 - t.length > 0 ? 60 - t.length : 0) + t.toUpperCase())); lines.push(''); }
+      });
+    });
+    return lines.join('\n').trim() + '\n';
+  }
+
+  $('docShowLabelsToggle').addEventListener('change', (e) => { state.docShowLabels = e.target.checked; renderFullDocument(); });
+  $('btnExportDocTxt').onclick = async () => {
+    const text = generateDocText();
+    if(text.trim().length === 0){ showToast('Todavía no hay guion escrito en ningún beat'); return; }
+    const p = await exportFile('guion-completo.txt', 'txt', text);
+    if(p) showToast('Documento exportado como .txt');
+  };
+
+  /* ===================== PUENTE NATIVO + EXPORTAR ARCHIVOS ===================== */
+  /* ===================== MODO WEB / iPhone: biblioteca de proyectos en el dispositivo (IndexedDB) ===================== */
+  const SERVER_MODE = (typeof window.__ARC_TOKEN === 'string');
+  const NATIVE = true; // siempre hay "almacén": el servicio local (Mac) o la biblioteca del dispositivo (web / iPhone)
+  const WEBDB = (() => {
+    let dbp = null; const mem = {projects: new Map(), kv: new Map()}; let broken = false;
+    function open(){
+      if(dbp) return dbp;
+      dbp = new Promise((resolve, reject) => {
+        try{
+          const r = indexedDB.open('arc-library', 1);
+          r.onupgradeneeded = () => { const db = r.result; db.createObjectStore('projects', {keyPath: 'name'}); db.createObjectStore('kv'); };
+          r.onsuccess = () => resolve(r.result);
+          r.onerror = () => reject(r.error);
+        }catch(err){ reject(err); }
+      }).catch(err => { broken = true; return null; });
+      return dbp;
+    }
+    async function run(store, mode, fn){
+      const db = await open();
+      if(!db){
+        return fn({ get: k => ({result: mem[store].get(k)}), put: v => { mem[store].set(store === 'projects' ? v.name : v.__k, store === 'projects' ? v : v.__v); }, getAll: () => ({result: [...mem[store].values()]}), delete: k => mem[store].delete(k), memory: true });
+      }
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(store, mode); const os = tx.objectStore(store);
+        let out; try{ out = fn(os); }catch(err){ reject(err); return; }
+        tx.oncomplete = () => resolve(out && 'result' in out ? out.result : undefined);
+        tx.onerror = () => reject(tx.error); tx.onabort = () => reject(tx.error);
+      });
+    }
+    return {
+      async getProject(name){ const db = await open(); if(!db) return mem.projects.get(name) || null; return new Promise((res, rej) => { const q = db.transaction('projects').objectStore('projects').get(name); q.onsuccess = () => res(q.result || null); q.onerror = () => rej(q.error); }); },
+      async putProject(rec){ const db = await open(); if(!db){ mem.projects.set(rec.name, rec); return; } return new Promise((res, rej) => { const tx = db.transaction('projects', 'readwrite'); tx.objectStore('projects').put(rec); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error); }); },
+      async listProjects(){ const db = await open(); if(!db) return [...mem.projects.values()]; return new Promise((res, rej) => { const q = db.transaction('projects').objectStore('projects').getAll(); q.onsuccess = () => res(q.result || []); q.onerror = () => rej(q.error); }); },
+      async getKv(k){ const db = await open(); if(!db) return mem.kv.get(k); return new Promise((res, rej) => { const q = db.transaction('kv').objectStore('kv').get(k); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); },
+      async setKv(k, v){ const db = await open(); if(!db){ if(v === undefined) mem.kv.delete(k); else mem.kv.set(k, v); return; } return new Promise((res, rej) => { const tx = db.transaction('kv', 'readwrite'); if(v === undefined) tx.objectStore('kv').delete(k); else tx.objectStore('kv').put(v, k); tx.oncomplete = () => res(); tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error); }); },
+      isMemoryOnly(){ return broken; }
+    };
+  })();
+  try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(err){}
+
+  function pickLocalFile(){
+    return new Promise(resolve => {
+      const inp = document.createElement('input'); inp.type = 'file'; // sin "accept": en iOS Archivos no reconoce la extensión .arc
+      inp.style.display = 'none'; document.body.appendChild(inp);
+      let done = false;
+      const finish = v => { if(done) return; done = true; inp.remove(); resolve(v); };
+      inp.addEventListener('change', () => {
+        const f = inp.files && inp.files[0]; if(!f){ finish(null); return; }
+        const rd = new FileReader(); rd.onload = () => finish({name: f.name, text: String(rd.result)}); rd.onerror = () => finish({error: 'No se pudo leer el archivo'}); rd.readAsText(f);
+      });
+      inp.addEventListener('cancel', () => finish(null));
+      inp.click();
+    });
+  }
+  function isTouchDevice(){ return /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); }
+  function cleanProjectName(n){
+    n = String(n || '').replace(/[\\/:*?"<>|\r\n]/g, '').trim().slice(0, 80);
+    if(!n) return null; return /\.arc$/i.test(n) ? n : n + '.arc';
+  }
+  async function shareOrDownload(name, ext, data){
+    const mime = ext === 'pdf' ? 'application/pdf' : (ext === 'arc' ? 'application/json' : 'text/plain');
+    const blob = new Blob([data], {type: mime});
+    if(isTouchDevice() && navigator.canShare && navigator.share){
+      try{
+        const file = new File([blob], name, {type: mime});
+        if(navigator.canShare({files: [file]})){ await navigator.share({files: [file], title: name}); return true; }
+      }catch(err){ if(err && err.name === 'AbortError') return true; /* si falla, se intenta la descarga */ }
+    }
+    const url = URL.createObjectURL(blob); const a = document.createElement('a');
+    a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    return true;
+  }
+  async function webNative(cmd, args){
+    switch(cmd){
+      case 'init': {
+        const settings = (await WEBDB.getKv('settings')) || {}; const rec = await WEBDB.getKv('recovery');
+        return {settings, recovery: rec ? rec.content : null, recoveryWhen: rec ? new Date(rec.mtime).toLocaleString('es-ES') : ''};
+      }
+      case 'setSettings': { const cur = (await WEBDB.getKv('settings')) || {}; Object.keys(args).forEach(k => { cur[k] = args[k]; }); await WEBDB.setKv('settings', cur); return {ok: true}; }
+      case 'recents': { const l = await WEBDB.listProjects(); l.sort((a, b) => b.mtime - a.mtime); return {items: l.map(p => p.name)}; }
+      case 'recovery': await WEBDB.setKv('recovery', {content: args.content, mtime: Date.now()}); return {ok: true};
+      case 'clearRecovery': await WEBDB.setKv('recovery', undefined); return {ok: true};
+      case 'save': {
+        const name = cleanProjectName(args.path); if(!name) return {error: 'Nombre no válido'};
+        await WEBDB.putProject({name, content: args.content, mtime: Date.now()}); return {path: name};
+      }
+      case 'saveAs': {
+        const sugg = String(args.suggested || 'Mi película.arc').replace(/\.arc$/i, '');
+        const typed = window.prompt('Nombre del proyecto:', sugg); if(typed === null) return {cancel: true};
+        const name = cleanProjectName(typed); if(!name) return {error: 'Nombre no válido'};
+        if(await WEBDB.getProject(name)){ if(!window.confirm('Ya existe "' + name + '". ¿Reemplazarlo?')) return {cancel: true}; }
+        await WEBDB.putProject({name, content: args.content, mtime: Date.now()}); return {path: name};
+      }
+      case 'open': {
+        const f = await pickLocalFile(); if(!f) return {cancel: true}; if(f.error) return f;
+        const name = cleanProjectName(f.name.replace(/\.(json|txt)$/i, '')) || 'Importado.arc';
+        try{ JSON.parse(f.text); }catch(err){ return {error: 'El archivo no es un proyecto ARC válido'}; }
+        let final = name; if(await WEBDB.getProject(final)){ final = name.replace(/\.arc$/i, '') + ' (importado ' + new Date().toISOString().slice(0, 10) + ').arc'; }
+        await WEBDB.putProject({name: final, content: f.text, mtime: Date.now()}); return {path: final, content: f.text};
+      }
+      case 'openPath': { const p = await WEBDB.getProject(args.path); return p ? {path: p.name, content: p.content} : {error: 'No se encuentra el proyecto'}; }
+      case 'saveFile': { await shareOrDownload(args.suggested, args.ext, args.bytes || args.text || ''); return {path: args.suggested}; }
+      case 'deleteProject': { return {error: 'no soportado'}; }
+    }
+    return {error: 'comando desconocido'};
+  }
+  /* Habla con el servicio local de ARC (127.0.0.1). Los textos grandes viajan como cuerpo, el resto en una cabecera. */
+  async function native(cmd, args){
+    args = Object.assign({}, args || {});
+    if(!SERVER_MODE){ try{ return await webNative(cmd, args); }catch(err){ return {error: String(err && err.message || err)}; } }
+    let body = '';
+    if(args.bytes){ body = args.bytes; delete args.bytes; }
+    else if(typeof args.content === 'string'){ body = args.content; delete args.content; }
+    else if(typeof args.text === 'string'){ body = args.text; delete args.text; }
+    try{
+      const res = await fetch('/api/' + cmd, {method: 'POST', body,
+        headers: {'X-ARC-Token': window.__ARC_TOKEN, 'X-ARC-Args': encodeURIComponent(JSON.stringify(args))}});
+      return await res.json();
+    }catch(err){ return {error: 'No se pudo contactar con ARC (' + err + ')'}; }
+  }
+  /* Guarda un archivo con el diálogo nativo (app) o como descarga (navegador).
+     data: string (texto) o Uint8Array (binario). Devuelve la ruta o null. */
+  async function exportFile(suggested, ext, data){
+    const args = {suggested, ext};
+    if(typeof data === 'string') args.text = data; else args.bytes = data;
+    const res = await native('saveFile', args);
+    if(res && res.error){ showToast('⚠ No se pudo guardar: ' + res.error); return null; }
+    return (res && res.path) || null;
+  }
+
+  /* ===================== EXPORTAR PDF (guion, generado aquí mismo) ===================== */
+  function safeFilename(s){
+    return (s || 'guion').replace(/[\\/:*?"<>|]/g, '').trim().slice(0, 60) || 'guion';
+  }
+
+  /* PDF mínimo con Courier 12 (fuente estándar, no hace falta incrustarla):
+     Letter, margen izq. 1.5", resto 1", 54 líneas/página, 60 columnas (7.2 pt por carácter). */
+  const CP1252 = {0x20AC:0x80,0x201A:0x82,0x0192:0x83,0x201E:0x84,0x2026:0x85,0x2020:0x86,0x2021:0x87,0x02C6:0x88,0x2030:0x89,
+    0x0160:0x8A,0x2039:0x8B,0x0152:0x8C,0x017D:0x8E,0x2018:0x91,0x2019:0x92,0x201C:0x93,0x201D:0x94,0x2022:0x95,0x2013:0x96,
+    0x2014:0x97,0x02DC:0x98,0x2122:0x99,0x0161:0x9A,0x203A:0x9B,0x0153:0x9C,0x017E:0x9E,0x0178:0x9F};
+  function toWinAnsi(str){
+    let out = '';
+    for(const ch of str.normalize('NFC')){
+      const c = ch.codePointAt(0);
+      if(c >= 0x20 && c <= 0x7E) out += ch;
+      else if(c >= 0xA0 && c <= 0xFF) out += ch;
+      else if(CP1252[c]) out += String.fromCharCode(CP1252[c]);
+      else if(c === 9) out += '    ';
+      else out += '?';
+    }
+    return out;
+  }
+  function pdfEscape(s){ return s.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)'); }
+  function wrapText(text, width){
+    const lines = [];
+    String(text).split(/\r?\n/).forEach(par => {
+      const words = par.split(/\s+/).filter(Boolean);
+      if(words.length === 0){ lines.push(''); return; }
+      let cur = '';
+      words.forEach(w => {
+        while(w.length > width){
+          if(cur){ lines.push(cur); cur = ''; }
+          lines.push(w.slice(0, width)); w = w.slice(width);
+        }
+        if(!cur) cur = w;
+        else if((cur + ' ' + w).length <= width) cur += ' ' + w;
+        else { lines.push(cur); cur = w; }
+      });
+      if(cur) lines.push(cur);
+    });
+    return lines;
+  }
+  const PDF_LAYOUT = {
+    heading:       {indent:0,  width:60, upper:true,  bold:true},
+    action:        {indent:0,  width:60},
+    note:          {indent:0,  width:60, italic:true},
+    character:     {indent:22, width:38, upper:true},
+    parenthetical: {indent:16, width:25},
+    dialogue:      {indent:10, width:35},
+    transition:    {indent:0,  width:60, upper:true, right:true},
+    divider:       {indent:0,  width:60, upper:true, bold:true, center:true},
+  };
+  /* Motor de maquetación ÚNICO: lo usan el editor (saltos de hoja) y el PDF, así que se ven igual.
+     Hoja A4, Courier 12 pt (7,2 pt por carácter, 12 pt por línea), 60 columnas, 57 líneas por página.
+     Los bloques no se parten entre páginas; personaje+diálogo y escena+primer bloque van juntos. */
+  function layoutBlocks(blocks, startScene){
+    const LINES = LINES_PER_PAGE;
+    let sceneCount = startScene || 0;
+    const n = blocks.length;
+    const cf = state.autoContd !== false ? computeContdFlags(blocks) : [];
+    const pre = blocks.map((b, bi) => {
+      const L = PDF_LAYOUT[b.type] || PDF_LAYOUT.action;
+      let text = (b.type === 'divider' ? '— ' + (b.text || '') + ' —' : (b.text || ''));
+      if(L.upper) text = text.toUpperCase();
+      text = text.replace(/\s+$/, ''); // saltos de línea/espacios finales no cuentan
+      if(b.type === 'character' && cf[bi]) text += " (CONT'D)";
+      return {L, lines: wrapText(text, L.width)};
+    });
+    const items = [];
+    let page = 0, line = 0, prev = null;
+    for(let i = 0; i < n; i++){
+      const type = blocks[i].type, {L, lines} = pre[i];
+      const tight = (type === 'dialogue' || type === 'parenthetical') && (prev === 'character' || prev === 'parenthetical');
+      let gap = (line === 0) ? 0 : (tight ? 0 : 1);
+      let need = gap + lines.length;
+      if(type === 'character'){
+        let j = i + 1;
+        while(j < n && blocks[j].type === 'parenthetical'){ need += pre[j].lines.length; j++; }
+        if(j < n && blocks[j].type === 'dialogue') need += pre[j].lines.length;
+      } else if((type === 'heading' || type === 'divider') && i + 1 < n){
+        need += 1 + pre[i + 1].lines.length;
+      }
+      let breakBefore = false, fillLines = 0;
+      if(line + need > LINES && line > 0){ fillLines = LINES - line; page++; line = 0; gap = 0; breakBefore = true; }
+      const start = line + gap;
+      const sceneNo = (type === 'heading' && state.sceneNumbers && (blocks[i].text || '').trim()) ? ++sceneCount : 0;
+      items.push({i, type, L, lines, page, line: start, breakBefore, fillLines, sceneNo});
+      let end = start + lines.length;
+      if(end > LINES){ page += Math.floor((end - 1) / LINES); end = ((end - 1) % LINES) + 1; }
+      line = end;
+      prev = type;
+    }
+    return {items, pages: page + 1, lastLine: line};
+  }
+  function buildScriptPdf(blocks, opts){
+    const PW = PAPER.pw, PH = PAPER.ph, LEFT = 108, TOP = PH - 72 - 10, LINES = LINES_PER_PAGE;
+    const res = layoutBlocks(blocks, (opts && opts.sceneStart) || 0);
+    const pages = Array.from({length: res.pages}, () => []);
+    res.items.forEach(it => {
+      if(it.sceneNo){
+        const pg0 = it.page + Math.floor(it.line / LINES), ln0 = it.line % LINES;
+        while(pages.length <= pg0) pages.push([]);
+        // número de escena a ambos lados, fuera de los márgenes (0,75" del borde izquierdo; tras el margen derecho)
+        pages[pg0].push({x: 54, y: TOP - ln0 * 12, t: String(it.sceneNo)});
+        pages[pg0].push({x: LEFT + 60 * 7.2 + 7.2, y: TOP - ln0 * 12, t: String(it.sceneNo)});
+      }
+      it.lines.forEach((l, k) => {
+        const abs = it.line + k, pg = it.page + Math.floor(abs / LINES), ln = abs % LINES;
+        while(pages.length <= pg) pages.push([]);
+        let col = it.L.indent;
+        if(it.L.right) col = 60 - l.length;
+        else if(it.L.center) col = Math.max(0, Math.floor((60 - l.length) / 2));
+        pages[pg].push({x: LEFT + col * 7.2, y: TOP - ln * 12, t: l, bold: !!it.L.bold, italic: !!it.L.italic});
+      });
+    });
+    const objs = [];
+    const add = s => { objs.push(s); return objs.length; };
+    add('<< /Type /Catalog /Pages 2 0 R >>');
+    add('PAGES');
+    add('<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>');
+    add('<< /Type /Font /Subtype /Type1 /BaseFont /Courier-Bold /Encoding /WinAnsiEncoding >>');
+    add('<< /Type /Font /Subtype /Type1 /BaseFont /Courier-Oblique /Encoding /WinAnsiEncoding >>');
+    const pageIds = [];
+    pages.forEach((items, pi) => {
+      let s = '';
+      if(pi > 0){
+        const n = toWinAnsi((pi + 1) + '.');
+        s += `BT /F1 12 Tf ${LEFT + 60 * 7.2 - n.length * 7.2} ${PH - 46} Td (${n}) Tj ET\n`;
+      }
+      items.forEach(it => {
+        s += `BT /${it.bold ? 'F2' : (it.italic ? 'F3' : 'F1')} 12 Tf ${it.x} ${it.y} Td (${pdfEscape(toWinAnsi(it.t))}) Tj ET\n`;
+      });
+      const cid = add(`<< /Length ${s.length} >>\nstream\n${s}endstream`);
+      pageIds.push(add(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PW} ${PH}] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R >> >> /Contents ${cid} 0 R >>`));
+    });
+    objs[1] = `<< /Type /Pages /Kids [${pageIds.map(i => i + ' 0 R').join(' ')}] /Count ${pageIds.length} >>`;
+    let pdf = '%PDF-1.4\n';
+    const offs = [];
+    objs.forEach((o, i) => { offs.push(pdf.length); pdf += `${i + 1} 0 obj\n${o}\nendobj\n`; });
+    const xref = pdf.length;
+    pdf += `xref\n0 ${objs.length + 1}\n0000000000 65535 f \n`;
+    offs.forEach(o => { pdf += String(o).padStart(10, '0') + ' 00000 n \n'; });
+    pdf += `trailer\n<< /Size ${objs.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
+    const bytes = new Uint8Array(pdf.length);
+    for(let i = 0; i < pdf.length; i++) bytes[i] = pdf.charCodeAt(i) & 0xFF;
+    return bytes;
+  }
+  window.__buildScriptPdf = buildScriptPdf;
+
+  async function exportBlocksToPdf(blocks, suggestedName, opts){
+    if(!blocks || blocks.length === 0){ showToast('No hay guion que exportar'); return; }
+    try{
+      const path = await exportFile(suggestedName, 'pdf', buildScriptPdf(blocks, opts));
+      if(path) showToast('PDF exportado');
+    }catch(err){ showToast('No se pudo exportar el PDF'); }
+  }
+
+  async function exportScriptPdf(){
+    const beat = getCurrentScriptBeat(); if(!beat) return;
+    const blocks = (beat.script || []).filter(b => (b.text || '').trim());
+    await exportBlocksToPdf(blocks, safeFilename(beat.title) + '.pdf', {sceneStart: sceneNumberStart(beat)});
+  }
+
+  async function exportDocPdf(){
+    const order = computeNarrativeOrder().filter(hasScriptContent);
+    const blocks = [];
+    order.forEach(beat => {
+      if(state.docShowLabels){
+        blocks.push({type:'divider', text: (beat.title || 'Sin título') + (beat.act ? ' · ' + actName(beat.act) : '')});
+      }
+      (beat.script || []).forEach(b => { if((b.text || '').trim()) blocks.push(b); });
+    });
+    await exportBlocksToPdf(blocks, 'guion-completo.pdf');
+  }
+
+  $('btnPrintScript').onclick = exportScriptPdf;
+  $('btnPrintDoc').onclick = exportDocPdf;
+
+  /* Permite seleccionar con el ratón a través de varias líneas/bloques.
+     Cada línea es un elemento editable independiente (para que Tab/Enter
+     funcionen como en un guion real), así que el navegador por defecto
+     corta la selección al cambiar de bloque. Selection.extend() sí puede
+     estirar la selección más allá de ese límite. */
+  (function initCrossBlockSelection(){
+    let dragging = false;
+    document.addEventListener('mousedown', (e) => {
+      dragging = !!(e.target.closest && e.target.closest('.script-page .sp-block'));
+    });
+    document.addEventListener('mousemove', (e) => {
+      if(!dragging) return;
+      if(!e.target.closest || !e.target.closest('.script-page')) return;
+      let range = null;
+      if(document.caretRangeFromPoint){
+        range = document.caretRangeFromPoint(e.clientX, e.clientY);
+      } else if(document.caretPositionFromPoint){
+        const pos = document.caretPositionFromPoint(e.clientX, e.clientY);
+        if(pos){ range = document.createRange(); range.setStart(pos.offsetNode, pos.offset); }
+      }
+      if(!range) return;
+      const sel = window.getSelection();
+      if(sel.rangeCount === 0) return;
+      try{ sel.extend(range.startContainer, range.startOffset); }catch(err){}
+    });
+    document.addEventListener('mouseup', () => { dragging = false; });
+  })();
+
+  /* Seleccionar todo el texto de la página con Ctrl+A (por defecto el
+     navegador solo selecciona dentro del bloque editable enfocado, ya
+     que cada línea es un elemento independiente). */
+  document.addEventListener('keydown', (e) => {
+    if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a'){
+      const page = e.target.closest && e.target.closest('.script-page');
+      if(page){
+        e.preventDefault();
+        const range = document.createRange();
+        range.selectNodeContents(page);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }
+  }, true);
+
+  /* ===================== PROYECTO: guardar / abrir / recientes ===================== */
+  function buildProjectData(){
+    return {
+      beats: state.beats.map(({__vis, ...b}) => b),
+      connections: state.connections,
+      characters: state.characters,
+      locations: state.locations,
+      moodCards: state.moodCards,
+      docShowLabels: state.docShowLabels,
+      paper: state.paper,
+      autoContd: state.autoContd,
+      sceneNumbers: state.sceneNumbers,
+    };
+  }
+  function applyProjectData(data){
+    state.beats = data.beats || [];
+    state.connections = data.connections || [];
+    state.characters = data.characters || [];
+    state.locations = data.locations || [];
+    state.moodCards = data.moodCards || [];
+    if(typeof data.docShowLabels === 'boolean') state.docShowLabels = data.docShowLabels;
+    if(data.paper && PAPERS[data.paper]) applyPaper(data.paper, false);
+    if(typeof data.autoContd === 'boolean'){ state.autoContd = data.autoContd; const c = $('docContdToggle'); if(c) c.checked = data.autoContd; }
+    if(typeof data.sceneNumbers === 'boolean'){ state.sceneNumbers = data.sceneNumbers; const c = $('docSceneNumToggle'); if(c) c.checked = data.sceneNumbers; }
+    state.focus = null;
+    render();
+    renderMood();
+    if(!$('workspaceDoc').classList.contains('hidden')) renderFullDocument();
+  }
+
+  /* ---- estado de guardado: autoguardado + copia de recuperación ---- */
+  let lastSnap = null;          // última versión guardada en el archivo
+  let lastRecoverySnap = null;  // última versión volcada a la copia de recuperación
+  let saveBusy = false;
+  let lastSaveErrorAt = 0;
+  function snapshot(){ return JSON.stringify(buildProjectData()); }
+  function markSaved(){ lastSnap = snapshot(); }
+  function baseName(p){ return (p || '').split(/[\\/]/).pop(); }
+  function setProjectLabel(path){
+    $('projectNameLabel').textContent = path ? baseName(path) : 'Proyecto sin guardar';
+    $('projectNameLabel').title = path || 'Aún no tiene archivo. Se guarda una copia de seguridad automática.';
+  }
+  function suggestedProjectName(){
+    if(state.currentProjectPath) return baseName(state.currentProjectPath);
+    const first = state.beats.find(b => (b.title || '').trim());
+    return safeFilename(first ? first.title : 'Mi película') + '.arc';
+  }
+  function persistSettings(obj){
+    if(NATIVE) return native('setSettings', obj);
+    try{ localStorage.setItem('arc.settings', JSON.stringify(Object.assign(loadWebSettings(), obj))); }catch(err){}
+  }
+  function loadWebSettings(){ try{ return JSON.parse(localStorage.getItem('arc.settings') || '{}'); }catch(err){ return {}; } }
+
+  /* Devuelve true si el proyecto quedó guardado. silent = autoguardado (sin avisos). */
+  async function saveProject(forcePicker, silent){
+    const data = buildProjectData();
+    const snap = JSON.stringify(data);
+    const content = JSON.stringify(data, null, 2);
+    if(NATIVE){
+      const res = (state.currentProjectPath && !forcePicker)
+        ? await native('save', {path: state.currentProjectPath, content})
+        : await native('saveAs', {suggested: suggestedProjectName(), content});
+      if(res && res.cancel) return false;
+      if(!res || res.error){
+        if(!silent || Date.now() - lastSaveErrorAt > 30000){ showToast('⚠ NO se ha podido guardar: ' + ((res && res.error) || 'error desconocido')); lastSaveErrorAt = Date.now(); }
+        return false;
+      }
+      const wasNamed = state.currentProjectPath === res.path;
+      state.currentProjectPath = res.path;
+      setProjectLabel(res.path);
+      lastSnap = snap;
+      if(!wasNamed){ native('clearRecovery'); lastRecoverySnap = null; }
+      if(!silent){ showToast('Proyecto guardado'); refreshRecentsMenu(); }
+      return true;
+    }
+    // navegador: se descarga el archivo .arc
+    const name = suggestedProjectName();
+    await exportFile(name, 'arc', content);
+    lastSnap = snap;
+    if(!silent) showToast('Copia descargada: ' + name);
+    return true;
+  }
+
+  function loadProjectResult(res){
+    applyProjectData(JSON.parse(res.content));
+    state.currentProjectPath = res.path;
+    setProjectLabel(res.path);
+    markSaved();
+    showToast('Proyecto abierto');
+    refreshRecentsMenu();
+  }
+
+  async function openProjectFromPath(path){
+    if(!NATIVE) return false;
+    try{
+      const res = await native('openPath', {path});
+      if(!res || res.error){ showToast('No se pudo abrir: ' + ((res && res.error) || 'archivo no encontrado')); return false; }
+      loadProjectResult(res);
+      return true;
+    }catch(err){ showToast('El archivo no es un proyecto ARC válido'); return false; }
+  }
+
+  async function openProjectDialog(){
+    if(!NATIVE){ $('fileImport').click(); return false; }
+    try{
+      const res = await native('open');
+      if(!res || res.cancel) return false;
+      if(res.error){ showToast('No se pudo abrir: ' + res.error); return false; }
+      loadProjectResult(res);
+      return true;
+    }catch(err){ showToast('El archivo no es un proyecto ARC válido'); return false; }
+  }
+
+  async function getRecents(){
+    if(!NATIVE) return [];
+    const res = await native('recents');
+    return (res && res.items) || [];
+  }
+
+  function renderProjectItemHtml(path, activePath){
+    const active = path === activePath;
+    return `<div class="project-item ${active ? 'active' : ''}" data-path="${escapeHtml(path)}">
+      <span class="project-item-name">${escapeHtml(baseName(path))}</span>
+      <span class="project-item-path">${escapeHtml(path)}</span>
+    </div>`;
+  }
+  const NO_RECENTS_WEB = 'Los proyectos se guardan como archivos .arc en Descargas. Usa Abrir… para cargar uno.';
+
+  async function refreshLeftSidebar(){
+    const list = $('leftSidebarList');
+    const recents = await getRecents();
+    if(!recents.length){
+      list.innerHTML = `<p style="color:var(--text-dim);font-size:12px;padding:6px;">${NATIVE ? 'Sin proyectos recientes' : NO_RECENTS_WEB}</p>`;
+      return;
+    }
+    list.innerHTML = recents.map(p => renderProjectItemHtml(p, state.currentProjectPath)).join('');
+    list.querySelectorAll('.project-item').forEach(el => { el.onclick = () => leftSidebarSwitchTo(el.dataset.path); });
+  }
+
+  async function refreshRecentsMenu(){
+    const list = $('menuRecentsList');
+    const recents = await getRecents();
+    if(!recents.length){
+      list.innerHTML = '<span class="app-menu-empty">Sin proyectos recientes</span>';
+    } else {
+      list.innerHTML = recents.map(p => `
+        <button class="app-menu-recent-item" data-path="${escapeHtml(p)}">
+          <span class="app-menu-recent-name">${escapeHtml(baseName(p))}</span>
+          <span class="app-menu-recent-path">${escapeHtml(p)}</span>
+        </button>
+      `).join('');
+      list.querySelectorAll('.app-menu-recent-item').forEach(btn => {
+        btn.onclick = () => { closeAllMenus(); leftSidebarSwitchTo(btn.dataset.path); };
+      });
+    }
+    refreshLeftSidebar();
+  }
+
+  /* ---- cambio seguro de proyecto: nunca se pierde el actual ---- */
+  function hasAnyContent(){
+    return state.beats.length > 0 || state.moodCards.length > 0 || state.characters.length > 0 || state.locations.length > 0;
+  }
+  async function guardedSwitch(){
+    if(state.currentProjectPath){
+      if(snapshot() !== lastSnap) return await saveProject(false, true);
+      return true;
+    }
+    if(hasAnyContent()){
+      showToast('Elige dónde guardar el proyecto actual antes de cambiar…');
+      return await saveProject(true);
+    }
+    return true;
+  }
+  async function leftSidebarSwitchTo(path){
+    if(path === state.currentProjectPath) return;
+    if(!(await guardedSwitch())) return;
+    await openProjectFromPath(path);
+  }
+  async function leftSidebarNew(){
+    if(!(await guardedSwitch())) return;
+    applyProjectData({});
+    state.currentProjectPath = null;
+    setProjectLabel(null);
+    markSaved();
+    showToast('Nuevo proyecto creado');
+    refreshRecentsMenu();
+  }
+  async function leftSidebarOpenDialog(){
+    if(!(await guardedSwitch())) return;
+    if(await openProjectDialog()) hideLauncher();
+  }
+  $('btnLeftNewProject').onclick = leftSidebarNew;
+  $('btnLeftOpenProject').onclick = leftSidebarOpenDialog;
+
+  $('btnCollapseLeftSidebar').onclick = () => {
+    $('leftSidebar').classList.add('collapsed');
+    $('btnExpandLeftSidebar').style.display = 'inline-flex';
+  };
+  $('btnExpandLeftSidebar').onclick = () => {
+    $('leftSidebar').classList.remove('collapsed');
+    $('btnExpandLeftSidebar').style.display = 'none';
+  };
+
+  /* ---- pantalla de inicio (launcher) ---- */
+  function showLauncher(){ $('launcherScreen').classList.add('show'); refreshLauncherRecents(); }
+  function hideLauncher(){ $('launcherScreen').classList.remove('show'); refreshLeftSidebar(); }
+
+  async function refreshLauncherRecents(){
+    const list = $('launcherRecentsList');
+    const recents = await getRecents();
+    if(!recents.length){
+      list.innerHTML = `<p style="color:var(--text-dim);font-size:12.5px;">${NATIVE ? 'Aún no hay proyectos recientes.' : NO_RECENTS_WEB}</p>`;
+      return;
+    }
+    list.innerHTML = recents.map(p => renderProjectItemHtml(p, null)).join('');
+    list.querySelectorAll('.project-item').forEach(el => {
+      el.onclick = async () => { if(await openProjectFromPath(el.dataset.path)) hideLauncher(); };
+    });
+  }
+
+  $('btnLauncherNew').onclick = () => {
+    applyProjectData({});
+    state.currentProjectPath = null;
+    setProjectLabel(null);
+    markSaved();
+    hideLauncher();
+  };
+  $('btnLauncherOpen').onclick = async () => { if(await openProjectDialog()) hideLauncher(); };
+
+  /* ---- recuperación de trabajo sin guardar ---- */
+  function writeRecovery(content){
+    if(NATIVE) return native('recovery', {content});
+    try{ localStorage.setItem('arc.recovery', content); }catch(err){ /* sin espacio */ }
+  }
+  function offerRecovery(content, when){
+    let data;
+    try{ data = JSON.parse(content); }catch(err){ return; }
+    const n = ['beats','moodCards','characters','locations'].reduce((a, k) => a + ((data[k] || []).length), 0);
+    if(!n) return;
+    const box = $('launcherRecovery');
+    box.innerHTML = `<div class="launcher-recovery">
+      <div><strong>Trabajo sin guardar recuperado</strong><br><span>${n} elementos${when ? ' · ' + escapeHtml(when) : ''}</span></div>
+      <button class="primary" id="btnRecoverWork">Recuperar</button>
+      <button class="ghost" id="btnDiscardRecovery">Descartar</button></div>`;
+    $('btnRecoverWork').onclick = () => {
+      applyProjectData(data);
+      state.currentProjectPath = null;
+      setProjectLabel(null);
+      lastSnap = null;           // sigue sin archivo: pedirá guardar al cambiar
+      box.innerHTML = '';
+      hideLauncher();
+      showToast('Trabajo recuperado. Usa Archivo → Guardar como… para darle nombre');
+    };
+    $('btnDiscardRecovery').onclick = () => {
+      if(NATIVE) native('clearRecovery'); else { try{ localStorage.removeItem('arc.recovery'); }catch(err){} }
+      box.innerHTML = '';
+    };
+  }
+
+  async function autosaveTick(){
+    if(saveBusy) return;
+    if($('launcherScreen').classList.contains('show')) return;
+    const snap = snapshot();
+    if(snap === lastSnap) return;
+    saveBusy = true;
+    try{
+      if(NATIVE && state.currentProjectPath){
+        await saveProject(false, true);
+      } else if(hasAnyContent() && snap !== lastRecoverySnap){
+        await writeRecovery(JSON.stringify(buildProjectData(), null, 2));
+        lastRecoverySnap = snap;
+      }
+    }catch(err){ /* se reintenta en el siguiente ciclo */ }
+    saveBusy = false;
+  }
+  /* El menú nativo lo invoca al cerrar la app: guarda todo ya. */
+  window.__arcFlush = async () => {
+    if($('launcherScreen').classList.contains('show')) return;
+    saveBusy = false;
+    try{ await autosaveTick(); }catch(err){}
+  };
+  window.__arcMenu = (action) => {
+    if(action === 'save') saveProject(false);
+    else if(action === 'saveas') saveProject(true);
+    else if(action === 'open') leftSidebarOpenDialog();
+    else if(action === 'new') leftSidebarNew();
+  };
+  window.addEventListener('beforeunload', (e) => {
+    if(!NATIVE && hasAnyContent() && snapshot() !== lastSnap){ e.preventDefault(); e.returnValue = ''; }
+  });
+
+  /* ---- menú de aplicación (Archivo / Preferencias) ---- */
+  function closeAllMenus(){
+    document.querySelectorAll('.app-menu-item.open').forEach(el => el.classList.remove('open'));
+  }
+  document.querySelectorAll('.app-menu-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      if(e.target.closest('.app-menu-dropdown') && !e.target.closest('button[data-action]') && !e.target.closest('.app-menu-recent-item')) return;
+      const wasOpen = item.classList.contains('open');
+      closeAllMenus();
+      if(!wasOpen){ item.classList.add('open'); if(item.dataset.menu === 'file') refreshRecentsMenu(); }
+    });
+  });
+  document.addEventListener('click', (e) => { if(!e.target.closest('.app-menu-item')) closeAllMenus(); });
+
+  $('menuFile').querySelectorAll('button[data-action]').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      closeAllMenus();
+      if(btn.dataset.action === 'save') saveProject(false);
+      else if(btn.dataset.action === 'saveas') saveProject(true);
+      else if(btn.dataset.action === 'open') leftSidebarOpenDialog();
+      else if(btn.dataset.action === 'export') $('btnExport').click();
+    };
+  });
+
+  function applyTheme(theme){
+    document.body.classList.toggle('theme-light', theme === 'light');
+    $('menuPrefs').querySelectorAll('button[data-action]').forEach(b => {
+      b.textContent = b.textContent.replace(/^[●○]\s*/, (b.dataset.action === 'theme-' + theme) ? '● ' : '○ ');
+    });
+  }
+  $('menuPrefs').querySelectorAll('button[data-action]').forEach(btn => {
+    btn.onclick = async (e) => {
+      e.stopPropagation();
+      closeAllMenus();
+      const theme = btn.dataset.action.replace('theme-', '');
+      applyTheme(theme);
+      persistSettings({theme});
+    };
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if(!(e.ctrlKey || e.metaKey)) return;
+    const k = e.key.toLowerCase();
+    if(k === 's'){ e.preventDefault(); saveProject(!!e.shiftKey && NATIVE); }
+    else if(NATIVE && k === 'o'){ e.preventDefault(); leftSidebarOpenDialog(); }
+    else if(NATIVE && k === 'n'){ e.preventDefault(); leftSidebarNew(); }
+  });
+
+  /* ===================== EXPORT / IMPORT (copia manual .json) ===================== */
+  $('btnExport').onclick = async () => {
+    const p = await exportFile(suggestedProjectName(), 'arc', JSON.stringify(buildProjectData(), null, 2));
+    if(p) showToast('Copia exportada');
+  };
+  $('btnImportBtn').onclick = () => $('fileImport').click();
+  $('fileImport').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try{
+        applyProjectData(JSON.parse(reader.result));
+        state.currentProjectPath = null;
+        setProjectLabel(null);
+        lastSnap = null;
+        hideLauncher();
+        showToast('Copia importada. Usa Guardar como… para guardarla');
+      }catch(err){
+        showToast('El archivo no es un JSON válido');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  });
+
+  /* ===================== INIT ===================== */
+  applyCanvasTransform(false);
+  applyMoodCanvasTransform(false);
+  buildMoodFilterChips();
+  setupBlockContainer($('scriptPage'));
+  setupBlockContainer($('docPage'));
+  render();
+
+
+  /* ---- móvil: la cabecera se esconde al escribir o desplazar el Documento para dejar sitio al guion ---- */
+  (function initChromeAutoHide(){
+    const mq = window.matchMedia ? window.matchMedia('(max-width: 820px)') : {matches: false};
+    const wrap = $('docPageWrap');
+    const inDoc = () => !$('workspaceDoc').classList.contains('hidden');
+    const hide = () => { if(mq.matches && inDoc()) document.body.classList.add('chrome-hidden'); };
+    const show = () => document.body.classList.remove('chrome-hidden');
+    let lastY = 0;
+    wrap.addEventListener('scroll', () => {
+      const y = wrap.scrollTop;
+      if(y > lastY + 12 && y > 60) hide(); else if(y < lastY - 24 || y < 10) show();
+      lastY = y;
+    }, {passive: true});
+    $('docPage').addEventListener('focusin', hide);
+    $('chromeToggle').onclick = () => { show(); };
+    document.addEventListener('click', (e) => { if(e.target.closest && e.target.closest('.ws-btn')) show(); });
+  })();
+  if('serviceWorker' in navigator && location.protocol.startsWith('http') && !SERVER_MODE){
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+  if(window.matchMedia && window.matchMedia('(max-width: 820px)').matches){
+    $('leftSidebar').classList.add('collapsed'); $('btnExpandLeftSidebar').style.display = 'inline-flex';
+    $('sidebar').classList.add('collapsed');
+  }
+  (async () => {
+    let init = {settings: {}, recovery: null, recoveryWhen: ''};
+    try{
+      if(NATIVE){ init = await native('init'); if(init.error) init = {settings: {}, recovery: null, recoveryWhen: ''}; }
+      else { init.settings = loadWebSettings(); init.recovery = localStorage.getItem('arc.recovery'); }
+    }catch(err){}
+    applyTheme((init.settings && init.settings.theme) || 'dark');
+    markSaved();
+    showLauncher();
+    if(init.recovery) offerRecovery(init.recovery, init.recoveryWhen);
+    setInterval(autosaveTick, 1000);
+    if(SERVER_MODE) setInterval(() => native('ping'), 3000);
+  })();
+
+  /* ===================== PAPEL (A4 / Carta) y (CONT'D) ===================== */
+  function applyPaper(key, rerender){
+    if(!PAPERS[key]) key = 'a4';
+    state.paper = key; PAPER = PAPERS[key]; LINES_PER_PAGE = PAPER.lines; PAGE_PX.bottom = PAPER.bottom;
+    const r = document.documentElement.style;
+    r.setProperty('--pg-w', PAPER.w + 'px'); r.setProperty('--pg-h', PAPER.h + 'px');
+    r.setProperty('--pg-right', PAPER.right + 'px'); r.setProperty('--pg-bottom', PAPER.bottom + 'px');
+    ['paperSelectDoc', 'paperSelectScript'].forEach(id => { const s = $(id); if(s) s.value = key; });
+    try{ localStorage.setItem('arc.paper', key); }catch(err){}
+    if(rerender){
+      if(!$('workspaceDoc').classList.contains('hidden')) renderFullDocument();
+      if($('scriptModalOverlay').classList.contains('show')){ renderScriptPage(); updateScriptStats(); }
+      if(window.__arcFitPages) setTimeout(window.__arcFitPages, 0);
+    }
+  }
+  ['paperSelectDoc', 'paperSelectScript'].forEach(id => { const s = $(id); if(s) s.addEventListener('change', () => applyPaper(s.value, true)); });
+  const sceneNumToggle = $('docSceneNumToggle');
+  if(sceneNumToggle) sceneNumToggle.addEventListener('change', () => {
+    state.sceneNumbers = sceneNumToggle.checked;
+    if(!$('workspaceDoc').classList.contains('hidden')) renderFullDocument();
+    if($('scriptModalOverlay').classList.contains('show')){ renderScriptPage(); updateScriptStats(); }
+  });
+  const contdToggle = $('docContdToggle');
+  if(contdToggle) contdToggle.addEventListener('change', () => {
+    state.autoContd = contdToggle.checked;
+    if(!$('workspaceDoc').classList.contains('hidden')) renderFullDocument();
+    if($('scriptModalOverlay').classList.contains('show')){ renderScriptPage(); updateScriptStats(); }
+  });
+  let savedPaper = 'a4'; try{ savedPaper = localStorage.getItem('arc.paper') || 'a4'; }catch(err){}
+  applyPaper(savedPaper, true);
+
+  /* ===================== HOJA A4: ajuste al ancho + guía de páginas ===================== */
+  (function(){
+    const mobileMQ = window.matchMedia('(max-width: 820px)');
+    function fit(){
+      document.querySelectorAll('.script-page-wrap').forEach(w => {
+        const pg = w.querySelector('.script-page'); if(!pg) return;
+        if(mobileMQ.matches || w.clientWidth === 0){ pg.style.zoom = ''; return; }
+        const fitZ = Math.min(1, Math.max(0.45, (w.clientWidth - 40) / PAPER.w));
+        const z = Math.max(0.3, Math.min(3, fitZ * userZoom));
+        pg.style.zoom = Math.abs(z - 1) < 0.001 ? '' : String(z);
+      });
+    }
+    /* zoom del usuario: Ctrl/Cmd + (más), Ctrl/Cmd - (menos), Ctrl/Cmd 0 (vista original) */
+    let userZoom = 1;
+    try{ const s = parseFloat(localStorage.getItem('arc.zoom')); if(s >= 0.5 && s <= 2.5) userZoom = s; }catch(err){}
+    function setUserZoom(z, quiet){
+      userZoom = Math.max(0.5, Math.min(2.5, Math.round(z * 100) / 100));
+      try{ localStorage.setItem('arc.zoom', String(userZoom)); }catch(err){}
+      fit();
+      if(!quiet) showToast('Zoom ' + Math.round(userZoom * 100) + '%');
+    }
+    function pageVisible(){
+      if(mobileMQ.matches) return false;
+      const m = $('scriptModalOverlay');
+      if(m && m.classList.contains('show')) return true;
+      return !$('workspaceDoc').classList.contains('hidden');
+    }
+    document.addEventListener('keydown', e => {
+      if(!(e.metaKey || e.ctrlKey) || e.altKey || !pageVisible()) return;
+      if(e.key === '+' || e.key === '=' ){ e.preventDefault(); setUserZoom(userZoom + 0.1); }
+      else if(e.key === '-' || e.key === '_'){ e.preventDefault(); setUserZoom(userZoom - 0.1); }
+      else if(e.key === '0'){ e.preventDefault(); setUserZoom(1); }
+    }, true);
+    document.addEventListener('wheel', e => {
+      if(!e.ctrlKey || !pageVisible()) return;
+      e.preventDefault();
+      setUserZoom(userZoom * (e.deltaY < 0 ? 1.05 : 1 / 1.05), true);
+    }, {passive: false});
+    window.__arcSetZoom = setUserZoom;
+    window.__arcFitPages = fit;
+    window.addEventListener('resize', fit);
+    if(typeof ResizeObserver !== 'undefined'){
+      const ro = new ResizeObserver(fit);
+      document.querySelectorAll('.script-page-wrap').forEach(w => ro.observe(w));
+    }
+    new MutationObserver(fit).observe(document.body, {attributes:true, subtree:true, attributeFilter:['class']});
+    setTimeout(fit, 50);
+  })();
+
+})();
+
+
+</script>
+</body>
+</html>
